@@ -7,7 +7,7 @@ import styles from '../styles/GoalForm.module.css';
 
 interface GoalFormProps {
   onClose: () => void;
-  onSave: (goal: Omit<Goal, 'id' | 'createdAt' | 'uid'>) => void;
+  onSave: (goal: Omit<Goal, 'id' | 'createdAt'>) => void;
 }
 
 const GoalForm: React.FC<GoalFormProps> = ({ onClose, onSave }) => {
@@ -21,6 +21,7 @@ const GoalForm: React.FC<GoalFormProps> = ({ onClose, onSave }) => {
       name,
       targetAmount: parseFloat(targetAmount),
       currentAmount: parseFloat(currentAmount) || 0,
+      uid: '', // Add a dummy uid to satisfy the type
     });
   };
 
