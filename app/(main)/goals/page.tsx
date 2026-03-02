@@ -29,7 +29,7 @@ const GoalsPage = () => {
   const handleOpenModal = () => setIsModalOpen(true);
   const handleCloseModal = () => setIsModalOpen(false);
 
-  const handleSaveGoal = async (goalData: Omit<Goal, 'id' | 'createdAt'>) => {
+  const handleSaveGoal = async (goalData: Omit<Goal, 'id' | 'createdAt' | 'uid'>) => {
     if (user) {
       await addGoal({ ...goalData, uid: user.uid });
       fetchGoals();
