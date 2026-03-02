@@ -3,29 +3,27 @@
 import { useState, useEffect } from 'react';
 import styles from '../styles/TransactionForm.module.css';
 import { getCards, CreditCard } from '../lib/cardsService';
-import { useAuth } from '../lib/AuthContext'; // Importe o useAuth
+import { useAuth } from '../lib/AuthContext';
 
 interface TransactionFormProps {
   onSave: (transaction: any) => void;
   onClose: () => void;
+  type: 'income' | 'expense';
+  budgets: any[];
 }
 
-const TransactionForm: React.FC<TransactionFormProps> = ({ onSave, onClose }) => {
-  const { user } = useAuth(); // Obtenha o usuário do contexto
+const TransactionForm: React.FC<TransactionFormProps> = ({ onSave, onClose, type, budgets }) => {
+  const { user } = useAuth();
   const [description, setDescription] = useState('');
   const [amount, setAmount] = useState('');
-  const [type, setType] = useState('expense');
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [category, setCategory] = useState('Outros');
   const [paymentMethod, setPaymentMethod] = useState('Outros');
   const [installments, setInstallments] = useState(1);
-  const [isIncome, setIsIncome] = useState(false);
   const [cards, setCards] = useState<CreditCard[]>([]);
   const [selectedCard, setSelectedCard] = useState('');
 
-  useEffect(() => {
-    setIsIncome(type === 'income');
-  }, [type]);
+  const isIncome = type === 'income';
 
   useEffect(() => {
     if (user) {
@@ -47,7 +45,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ onSave, onClose }) =>
       category,
       paymentMethod,
       installments: Number(installments),
-      cardId: selectedCard, // Adicione o cardId
+      cardId: selectedCard,
     });
   };
 
@@ -59,23 +57,6 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ onSave, onClose }) =>
           <button onClick={onClose} className={styles.closeButton}>&times;</button>
         </div>
         <form onSubmit={handleSubmit}>
-          <div className={styles.typeSwitch}>
-            <button
-              type="button"
-              className={`${styles.switchButton} ${!isIncome ? styles.active : ''}`}
-              onClick={() => setType('expense')}
-            >
-              Despesa
-            </button>
-            <button
-              type="button"
-              className={`${styles.switchButton} ${isIncome ? styles.active : ''}`}
-              onClick={() => setType('income')}
-            >
-              Receita
-            </button>
-          </div>
-
           <div className={styles.formGroup}>
             <label htmlFor="description">Descrição</label>
             <input
