@@ -1,0 +1,87 @@
+
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.75);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(5px);
+}
+
+.modalContent {
+  background-color: #2D2D3A;
+  padding: 2rem;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 550px;
+  border: 1px solid #3a3a4a;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.modalHeader h2 {
+  font-size: 1.5rem;
+  color: #E0E0E0;
+  margin: 0;
+}
+
+.closeButton {
+  background: none;
+  border: none;
+  color: #9CA3AF;
+  font-size: 2rem;
+  cursor: pointer;
+  transition: color 0.2s;
+  line-height: 1;
+}
+
+.closeButton:hover {
+  color: #FFF;
+}
+
+.transactionsList {
+  max-height: 400px;
+  overflow-y: auto;
+  margin-top: 1rem;
+}
+
+.transactionItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.8rem 0.5rem;
+  border-bottom: 1px solid #3a3a4a;
+}
+
+.transactionItem:last-child {
+  border-bottom: none;
+}
+
+.noTransactions {
+  text-align: center;
+  color: #9CA3AF;
+  padding: 2rem 0;
+}
+
+.incomeAmount {
+  color: #10B981;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.expenseAmount {
+  color: #EF4444;
+  font-weight: 600;
+  font-size: 1rem;
+}

@@ -1,0 +1,11 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /creditCards/{cardId} {
+      // Allow create if the new document's uid matches the user's uid
+      allow create: if request.auth.uid == request.resource.data.uid;
+      // Allow read, update, delete if the user is the owner of the existing document
+      allow read, update, delete: if request.auth.uid == resource.data.uid;
+    }
+  }
+}

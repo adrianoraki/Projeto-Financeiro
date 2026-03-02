@@ -1,0 +1,83 @@
+
+.headerContainer {
+    background-color: #1C1C22;
+    padding: 1.5rem;
+    border-radius: 12px;
+    margin-bottom: 2rem;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+  }
+  
+  .summaryCards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .card {
+    background-color: #2A2A33;
+    padding: 1.2rem;
+    border-radius: 10px;
+    border-left: 5px solid #0070F3;
+  }
+  
+  .card h4 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1rem;
+    color: #A0A0A0;
+    font-weight: 500;
+  }
+  
+  .card p {
+    margin: 0;
+    font-size: 1.75rem;
+    font-weight: 600;
+  }
+  
+  .income {
+    color: #10B981;
+  }
+  
+  .expense {
+    color: #EF4444;
+  }
+
+  .balance {
+    color: #0070F3;
+  }
+  
+  .actions {
+    display: flex;
+    gap: 1rem;
+  }
+  
+  .button {
+    border: none;
+    padding: 0.8rem 1.5rem;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .incomeButton {
+    background-color: #10B981;
+    color: white;
+  }
+
+  .incomeButton:hover {
+    background-color: #0e9f71;
+    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.2);
+  }
+  
+  .expenseButton {
+    background-color: #EF4444;
+    color: white;
+  }
+
+  .expenseButton:hover {
+    background-color: #d93a3a;
+    box-shadow: 0 4px 15px rgba(239, 68, 68, 0.2);
+  }
+  

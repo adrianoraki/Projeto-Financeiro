@@ -1,0 +1,46 @@
+
+.container {
+  padding: 0.5rem; /* Reduzido de 1rem para 0.5rem */
+  color: #E0E0E0;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem; /* Reduzido de 1rem para 0.5rem */
+}
+
+.header h1 {
+  font-size: 2rem;
+  font-weight: 600;
+}
+
+.addButton {
+  background-color: #10B981; /* Verde */
+  color: white;
+  padding: 0.8rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.addButton:hover {
+  background-color: #059669;
+}
+
+.goalsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.goalCard {
+  background-color: #1C1C22; /* Grafite */
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}

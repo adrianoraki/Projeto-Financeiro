@@ -1,0 +1,43 @@
+
+.container {
+  padding: 0.5rem; /* Reduzido de 1rem para 0.5rem */
+  color: #E0E0E0;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem; /* Reduzido de 1rem para 0.5rem */
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #FFFFFF;
+}
+
+.addButton {
+  padding: 0.8rem 1.5rem;
+  border: none;
+  background-color: #0070F3;
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 4px 14px 0 rgba(0, 118, 255, 0.39);
+}
+
+.addButton:hover {
+  background-color: #005bb5;
+  box-shadow: 0 6px 20px 0 rgba(0, 118, 255, 0.23);
+}
+
+.budgetGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+}

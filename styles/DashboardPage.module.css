@@ -1,0 +1,31 @@
+
+.container {
+    padding: 0.5rem; /* Reduzido de 1rem para 0.5rem */
+    background-color: #121212;
+    color: #E0E0E0;
+  }
+  
+  .chartsGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 2rem;
+    margin-top: 0.5rem; /* Reduzido de 1rem para 0.5rem */
+  }
+  
+  .chartContainer {
+    background-color: #1C1C22;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+    display: flex;
+    flex-direction: column;
+    height: 400px; /* Fixed height for consistency */
+  }
+  
+  .chartContainer h3 {
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+    text-align: center;
+    font-size: 1.25rem;
+    font-weight: 600;
+  }

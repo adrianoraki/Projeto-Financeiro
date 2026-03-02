@@ -1,0 +1,11 @@
+
+.layout {
+  display: flex;
+}
+
+.mainContent {
+  margin-left: 250px; /* Same as sidebar width */
+  padding: 2rem;
+  width: calc(100% - 250px);
+  background-color: #f4f7fa;
+}

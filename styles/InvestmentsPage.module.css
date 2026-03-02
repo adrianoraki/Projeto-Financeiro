@@ -1,0 +1,24 @@
+
+.container {
+  width: 100%;
+}
+
+.header {
+  margin-bottom: 0.5rem; /* Reduzido de 1rem para 0.5rem */
+}
+
+.header h1 {
+  font-size: 2rem;
+  color: #333;
+}
+
+.header p {
+  font-size: 1rem;
+  color: #666;
+}
+
+.investmentsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 1.5rem;
+}

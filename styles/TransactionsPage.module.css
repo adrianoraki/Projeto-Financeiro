@@ -1,0 +1,226 @@
+
+.container {
+    background-color: #1a1a2e;
+    padding: 0.5rem; /* Reduzido de 1rem para 0.5rem */
+    border-radius: 15px;
+    color: #e0e0e0;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem; /* Reduzido de 1rem para 0.5rem */
+}
+
+.addButton {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.addButton:hover {
+    background-color: #0056b3;
+}
+
+.filters {
+    display: flex;
+    gap: 2rem;
+    margin-bottom: 2rem;
+    align-items: center;
+}
+
+.filters select {
+    padding: 8px 12px;
+    border-radius: 5px;
+    border: 1px solid #333;
+    background-color: #2c2c3e;
+    color: #e0e0e0;
+}
+
+.transactionsList {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.transactionItem {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #2c2c3e;
+    padding: 1rem;
+    border-radius: 8px;
+    border-left: 5px solid transparent;
+}
+
+.income .transactionDetails {
+    border-left-color: #28a745;
+}
+
+.expense .transactionDetails {
+    border-left-color: #dc3545;
+}
+
+.statusToggle {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-right: 1rem;
+}
+
+.statusToggle input[type="checkbox"] {
+    cursor: pointer;
+}
+
+.statusToggle label {
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.transactionDetails {
+    flex-grow: 1;
+}
+
+.transactionDetails span {
+    display: block;
+    font-size: 1.1rem;
+}
+
+.transactionDetails small {
+    color: #a0a0a0;
+}
+
+.transactionAmount {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.transactionAmount span.income {
+    color: #28a745;
+    font-weight: bold;
+}
+
+.transactionAmount span.expense {
+    color: #dc3545;
+    font-weight: bold;
+}
+
+.deleteButton {
+    background: none;
+    border: none;
+    color: #ff4d4d;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.deleteButton:hover {
+    color: #ff1a1a;
+}
+
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modalContent {
+    background-color: #2c2c3e;
+    padding: 1.2rem;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 400px;
+    position: relative;
+    /* max-height e overflow removidos para altura natural */
+}
+
+.modalContent h2 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+}
+
+.closeButton {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    font-size: 1.4rem;
+    cursor: pointer;
+}
+
+.formGroup {
+    margin-bottom: 0.5rem; /* Margem bem reduzida */
+}
+
+.formGroup label {
+    display: block;
+    margin-bottom: 0.2rem;
+    font-size: 0.85rem;
+}
+
+.formGroup input,
+.formGroup select {
+    width: 100%;
+    padding: 5px 8px; /* Padding bem reduzido */
+    border-radius: 5px;
+    border: 1px solid #333;
+    background-color: #1a1a2e;
+    color: #e0e0e0;
+    font-size: 0.9rem;
+}
+
+.radioGroup {
+    display: flex;
+    gap: 0.8rem;
+}
+
+.typeButton {
+    flex: 1;
+    padding: 7px; /* Padding reduzido */
+    border-radius: 5px;
+    border: 1px solid #333;
+    background-color: transparent;
+    color: #e0e0e0;
+    cursor: pointer;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.typeButton.activeIncome {
+    background-color: #28a745;
+    border-color: #28a745;
+}
+
+.typeButton.activeExpense {
+    background-color: #dc3545;
+    border-color: #dc3545;
+}
+
+.submitButton {
+    width: 100%;
+    padding: 9px;
+    margin-top: 1rem;
+    border-radius: 5px;
+    border: none;
+    background-color: #007bff;
+    color: white;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.submitButton:hover {
+    background-color: #0056b3;
+}

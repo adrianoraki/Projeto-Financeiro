@@ -1,0 +1,26 @@
+
+.card {
+  background-color: #ffffff;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.card h4 {
+  margin: 0 0 0.5rem 0;
+  color: #6c757d;
+  font-size: 1rem;
+}
+
+.rate {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #007bff;
+  margin: 0.5rem 0;
+}
+
+.source {
+  font-size: 0.8rem;
+  color: #adb5bd;
+}
