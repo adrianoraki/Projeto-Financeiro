@@ -3,11 +3,11 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import { signInWithEmailAndPassword, signInWithPopup, signOut } from 'firebase/auth';
 import { auth, provider } from '../../lib/firebase';
 import { useAuth } from '../../lib/AuthContext';
 import styles from '../../styles/Auth.module.css';
+import Link from 'next/link';
 
 export default function LoginPage() {
   const { user } = useAuth();
@@ -32,12 +32,13 @@ export default function LoginPage() {
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       
+      // This check was added from the local version, it's a good security practice.
       if (!userCredential.user.emailVerified) {
-        await signOut(auth); // Desloga o usuário
+        await signOut(auth); // Sign out the user
         setError('Seu e-mail ainda não foi verificado. Por favor, cheque sua caixa de entrada e clique no link de confirmação.');
         return;
       }
-      // Se o e-mail for verificado, o useEffect cuidará do redirecionamento.
+      // If email is verified, the useEffect will handle the redirect.
 
     } catch (error) {
       setError('Falha ao entrar. Verifique seu e-mail e senha.');
@@ -49,7 +50,7 @@ export default function LoginPage() {
     setError(null);
     try {
       await signInWithPopup(auth, provider);
-      // O useEffect cuidará do redirecionamento após o login com Google.
+      // The useEffect will handle the redirect after Google sign-in.
     } catch (error) {
       setError('Falha ao entrar com o Google. Tente novamente.');
       console.error('Error with Google sign in: ', error);
@@ -57,7 +58,7 @@ export default function LoginPage() {
   };
 
   if (loading) {
-    return null; // Ou um spinner de carregamento
+    return null; // Or a loading spinner
   }
 
   return (

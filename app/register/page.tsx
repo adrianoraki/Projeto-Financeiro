@@ -1,12 +1,13 @@
+
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
-import { auth, db } from '../../lib/firebase';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { auth } from '../../lib/firebase';
+import { useAuth } from '../../lib/AuthContext';
 import styles from '../../styles/Auth.module.css';
+import Link from 'next/link';
 
 const InfoIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={styles.tooltipIcon}>
@@ -15,18 +16,26 @@ const InfoIcon = () => (
 );
 
 export default function RegisterPage() {
-  const [name, setName] = useState('');
+  const { user } = useAuth();
+  const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [cardNickname, setCardNickname] = useState('');
-  const [bankName, setBankName] = useState('');
-  const [cardFlag, setCardFlag] = useState('');
-  const [expiryDate, setExpiryDate] = useState('');
+  const [cardName, setCardName] = useState('');
+  const [cardBrand, setCardBrand] = useState('');
+  const [cardDueDate, setCardDueDate] = useState('');
   const [error, setError] = useState<string | null>(null);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
   const [showCardForm, setShowCardForm] = useState(false);
   const router = useRouter();
+
+  useEffect(() => {
+    if (user) {
+      router.push('/dashboard');
+    } else {
+      setLoading(false);
+    }
+  }, [user, router]);
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,22 +48,35 @@ export default function RegisterPage() {
 
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
-
-      await updateProfile(user, { displayName: name });
       
-      if (showCardForm && cardNickname) {
-        await addDoc(collection(db, 'cards'), {
-          uid: user.uid,
-          name: cardNickname,
-          brand: bankName || 'Não especificado',
-          invoiceDueDate: Number(expiryDate) || 1,
-          createdAt: serverTimestamp(),
+      await updateProfile(userCredential.user, {
+        displayName: fullName,
+      });
+
+      if (showCardForm && cardName && cardBrand && cardDueDate) {
+        const idToken = await userCredential.user.getIdToken();
+        const response = await fetch('/api/cards', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${idToken}`,
+          },
+          body: JSON.stringify({ 
+            cardName, 
+            cardBrand, 
+            cardDueDate: parseInt(cardDueDate, 10)
+          }),
         });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          setError(`Usuário criado, mas falha ao salvar cartão: ${errorData.error}`);
+          setTimeout(() => router.push('/dashboard'), 3000);
+          return;
+        }
       }
-
-      setSuccessMessage('Cadastro realizado com sucesso! Você já pode fazer login.');
-
+      
+      router.push('/dashboard');
     } catch (error: any) {
       if (error.code === 'auth/email-already-in-use') {
         setError('Este e-mail já está em uso. Tente fazer login.');
@@ -65,17 +87,8 @@ export default function RegisterPage() {
     }
   };
 
-  if (successMessage) {
-    return (
-      <div className={styles.container}>
-        <div className={styles.backgroundImage} />
-        <div className={styles.formContainer}>
-          <h1>Cadastro Concluído</h1>
-          <p className={styles.success}>{successMessage}</p>
-          <Link href="/login" className={styles.linkButton}>Ir para Login</Link>
-        </div>
-      </div>
-    );
+  if (loading) {
+    return null; 
   }
 
   return (
@@ -84,7 +97,7 @@ export default function RegisterPage() {
       <div className={styles.formContainer}>
         <h1>Criar Conta</h1>
         <form onSubmit={handleRegister}>
-          <input type="text" placeholder="Nome Completo" value={name} onChange={(e) => setName(e.target.value)} required />
+          <input type="text" placeholder="Nome Completo" value={fullName} onChange={(e) => setFullName(e.target.value)} required />
           <input type="email" placeholder="E-mail" value={email} onChange={(e) => setEmail(e.target.value)} required />
           <input type="password" placeholder="Senha" value={password} onChange={(e) => setPassword(e.target.value)} required />
           <input type="password" placeholder="Confirmar Senha" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required />
@@ -100,19 +113,29 @@ export default function RegisterPage() {
               </div>
             </div>
           ) : (
-            <div className={styles.cardForm}>
+            <div className={styles.cardFields}>
               <h3>Detalhes do Cartão (Opcional)</h3>
-              <input type="text" placeholder="Apelido do Cartão (ex: Inter, Nubank)" value={cardNickname} onChange={(e) => setCardNickname(e.target.value)} />
-              <input type="text" placeholder="Nome do Banco" value={bankName} onChange={(e) => setBankName(e.target.value)} />
-              <select value={cardFlag} onChange={(e) => setCardFlag(e.target.value)}>
-                  <option value="">Selecione a Bandeira</option>
-                  <option value="Visa">Visa</option>
-                  <option value="Mastercard">Mastercard</option>
-                  <option value="Elo">Elo</option>
-                  <option value="American Express">American Express</option>
-                  <option value="Outra">Outra</option>
-              </select>
-              <input type="text" placeholder="Dia do Vencimento da Fatura" value={expiryDate} onChange={(e) => setExpiryDate(e.target.value)} />
+              <input
+                type="text"
+                placeholder="Nome no Cartão"
+                value={cardName}
+                onChange={(e) => setCardName(e.target.value)}
+                required={showCardForm}
+              />
+              <input
+                type="text"
+                placeholder="Bandeira (Ex: Visa, Mastercard)"
+                value={cardBrand}
+                onChange={(e) => setCardBrand(e.target.value)}
+                required={showCardForm}
+              />
+              <input
+                type="number"
+                placeholder="Dia de Vencimento da Fatura"
+                value={cardDueDate}
+                onChange={(e) => setCardDueDate(e.target.value)}
+                required={showCardForm}
+              />
             </div>
           )}
           
@@ -122,7 +145,9 @@ export default function RegisterPage() {
 
         <p>
           Já tem uma conta?{' '}
-          <Link href="/login">Faça login aqui</Link>
+          <Link href="/login">
+            Faça login aqui
+          </Link>
         </p>
       </div>
     </div>
