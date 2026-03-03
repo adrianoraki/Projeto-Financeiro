@@ -32,13 +32,11 @@ export default function LoginPage() {
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       
-      // This check was added from the local version, it's a good security practice.
       if (!userCredential.user.emailVerified) {
-        await signOut(auth); // Sign out the user
+        await signOut(auth); 
         setError('Seu e-mail ainda não foi verificado. Por favor, cheque sua caixa de entrada e clique no link de confirmação.');
         return;
       }
-      // If email is verified, the useEffect will handle the redirect.
 
     } catch (error) {
       setError('Falha ao entrar. Verifique seu e-mail e senha.');
@@ -50,7 +48,6 @@ export default function LoginPage() {
     setError(null);
     try {
       await signInWithPopup(auth, provider);
-      // The useEffect will handle the redirect after Google sign-in.
     } catch (error) {
       setError('Falha ao entrar com o Google. Tente novamente.');
       console.error('Error with Google sign in: ', error);
@@ -58,7 +55,7 @@ export default function LoginPage() {
   };
 
   if (loading) {
-    return null; // Or a loading spinner
+    return null; 
   }
 
   return (

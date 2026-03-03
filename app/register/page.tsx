@@ -26,7 +26,7 @@ export default function RegisterPage() {
   const [cardDueDate, setCardDueDate] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  const [showCardForm, setShowCardForm] = useState(false);
+  const [showCardFields, setShowCardFields] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -53,7 +53,7 @@ export default function RegisterPage() {
         displayName: fullName,
       });
 
-      if (showCardForm && cardName && cardBrand && cardDueDate) {
+      if (showCardFields && cardName && cardBrand && cardDueDate) {
         const idToken = await userCredential.user.getIdToken();
         const response = await fetch('/api/cards', {
           method: 'POST',
@@ -88,7 +88,7 @@ export default function RegisterPage() {
   };
 
   if (loading) {
-    return null; 
+    return null;
   }
 
   return (
@@ -97,48 +97,78 @@ export default function RegisterPage() {
       <div className={styles.formContainer}>
         <h1>Criar Conta</h1>
         <form onSubmit={handleRegister}>
-          <input type="text" placeholder="Nome Completo" value={fullName} onChange={(e) => setFullName(e.target.value)} required />
-          <input type="email" placeholder="E-mail" value={email} onChange={(e) => setEmail(e.target.value)} required />
-          <input type="password" placeholder="Senha" value={password} onChange={(e) => setPassword(e.target.value)} required />
-          <input type="password" placeholder="Confirmar Senha" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required />
-          
-          {!showCardForm ? (
-            <div className={styles.optionalButtonContainer}>
-              <button type="button" onClick={() => setShowCardForm(true)} className={styles.optionalButton}>+ Adicionar primeiro cartão (Opcional)</button>
-              <div className={styles.tooltipContainer}>
+          <input
+            type="text"
+            placeholder="Nome Completo"
+            value={fullName}
+            onChange={(e) => setFullName(e.target.value)}
+            required
+          />
+          <input
+            type="email"
+            placeholder="E-mail"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+          <input
+            type="password"
+            placeholder="Senha"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+          <input
+            type="password"
+            placeholder="Confirmar Senha"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            required
+          />
+
+          <div className={styles.optionalActionContainer}>
+             <button 
+              type="button"
+              className={styles.toggleCardButton}
+              onClick={() => setShowCardFields(!showCardFields)}
+            >
+              {showCardFields ? 'Cancelar Cartão' : '+ Adicionar Cartão (Opcional)'}
+            </button>
+            <div className={styles.tooltipContainer}>
                 <InfoIcon />
                 <span className={styles.tooltipText}>
                   Fique tranquilo! As informações são apenas para organização. Não pedimos dados sensíveis como número do cartão ou código de segurança.
                 </span>
               </div>
-            </div>
-          ) : (
+          </div>
+
+          {showCardFields && (
             <div className={styles.cardFields}>
-              <h3>Detalhes do Cartão (Opcional)</h3>
+               <h3>Detalhes do Cartão (Opcional)</h3>
               <input
                 type="text"
                 placeholder="Nome no Cartão"
                 value={cardName}
                 onChange={(e) => setCardName(e.target.value)}
-                required={showCardForm}
+                required={showCardFields}
               />
               <input
                 type="text"
                 placeholder="Bandeira (Ex: Visa, Mastercard)"
                 value={cardBrand}
                 onChange={(e) => setCardBrand(e.target.value)}
-                required={showCardForm}
+                required={showCardFields}
               />
               <input
                 type="number"
                 placeholder="Dia de Vencimento da Fatura"
                 value={cardDueDate}
                 onChange={(e) => setCardDueDate(e.target.value)}
-                required={showCardForm}
+                required={showCardFields}
               />
             </div>
           )}
-          
+
           <button type="submit">Registrar</button>
           {error && <p className={styles.error}>{error}</p>}
         </form>
