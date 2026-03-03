@@ -3,7 +3,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { FaHome, FaExchangeAlt, FaCalendarAlt, FaChartPie, FaPiggyBank, FaWallet, FaSignOutAlt, FaCreditCard, FaCamera } from 'react-icons/fa';
+import { FaHome, FaExchangeAlt, FaCalendarAlt, FaChartPie, FaPiggyBank, FaWallet, FaSignOutAlt, FaCamera } from 'react-icons/fa';
 import styles from '../styles/Sidebar.module.css';
 import { useAuth } from '../lib/AuthContext';
 import { useRef } from 'react';
@@ -60,7 +60,6 @@ const Sidebar = () => {
           <li className={isActive('/') ? styles.active : ''}>
             <Link href="/"><FaHome /> <span>Dashboard</span></Link>
           </li>
-          {/* ... outros itens de menu ... */}
           <li className={isActive('/transactions') ? styles.active : ''}>
             <Link href="/transactions"><FaExchangeAlt /> <span>Transações</span></Link>
           </li>
@@ -76,8 +75,8 @@ const Sidebar = () => {
           <li className={isActive('/goals') ? styles.active : ''}>
             <Link href="/goals"><FaPiggyBank /> <span>Metas</span></Link>
           </li>
-          <li className={isActive('/cards') ? styles.active : ''}>
-            <Link href="/cards"><FaCreditCard /> <span>Meus Cartões</span></Link>
+          <li className={isActive('/payment-methods') ? styles.active : ''}>
+            <Link href="/payment-methods"><FaWallet /> <span>Formas de Pagamento</span></Link>
           </li>
         </ul>
       </nav>

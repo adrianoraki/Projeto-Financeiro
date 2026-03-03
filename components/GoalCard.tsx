@@ -2,63 +2,67 @@
 'use client';
 
 import { useState } from 'react';
-import { Goal, updateGoal } from '../lib/goalsService';
-import AddMoneyModal from './AddMoneyModal'; // Importando o novo modal
 import styles from '../styles/GoalCard.module.css';
 
-interface GoalCardProps {
-  goal: Goal;
-  onGoalUpdate: () => void; // Callback para atualizar a lista de metas
+// Tipagem para o objeto da meta
+interface Goal {
+  title: string;
+  current: number;
+  goal: number;
 }
 
-const GoalCard: React.FC<GoalCardProps> = ({ goal, onGoalUpdate }) => {
-  const [isAddMoneyModalOpen, setIsAddMoneyModalOpen] = useState(false);
-  const progress = (goal.currentAmount / goal.targetAmount) * 100;
+interface GoalCardProps {
+  goal: Goal | undefined; // A propriedade pode ser indefinida
+}
 
-  const formatCurrency = (value: number) => {
+const GoalCard = ({ goal }: GoalCardProps) => {
+  const [amount, setAmount] = useState('');
+
+  // Função de formatação de moeda robusta
+  const formatCurrency = (value: number | undefined | null) => {
+    if (typeof value !== 'number' || isNaN(value)) {
+      return (0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    }
     return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
   };
 
-  const handleSaveMoney = async (amount: number) => {
-    const newCurrentAmount = goal.currentAmount + amount;
-    if (goal.id) {
-      await updateGoal(goal.id, { currentAmount: newCurrentAmount });
-      onGoalUpdate(); // Dispara a atualização na página pai
-      setIsAddMoneyModalOpen(false);
-    }
+  const handleSaveMoney = async (saveAmount: number) => {
+    if (!goal || saveAmount <= 0) return;
+    // Lógica para atualizar a meta (ex: chamar uma API ou atualizar o estado global)
+    console.log(`Saving ${saveAmount} for ${goal.title}`);
+    setAmount('');
   };
 
+  // Verificação de segurança: Se a meta não existir, não renderiza nada ou um placeholder
+  if (!goal) {
+    // Pode retornar null ou um componente de "loading"
+    return <div className={styles.goalCard}> <p>Carregando meta...</p> </div>;
+  }
+
+  const progress = (goal.current / goal.goal) * 100;
+
   return (
-    <div className={styles.card}>
-      <div className={styles.header}>
-        <h3>{goal.name}</h3>
+    <div className={styles.goalCard}>
+      <div className={styles.cardHeader}>
+        <h3>Meta: {goal.title}</h3>
       </div>
       <div className={styles.progressContainer}>
-        <div 
-          className={styles.progressBar}
-          style={{ width: `${progress}%` }}
-        ></div>
+        <div className={styles.progressBar} style={{ width: `${progress}%` }}></div>
       </div>
-      <div className={styles.amounts}>
-        <div className={styles.amount}>
-          <span className={styles.label}>Alcançado</span>
-          <span className={styles.value}>{formatCurrency(goal.currentAmount)}</span>
-        </div>
-        <div className={styles.amount}>
-          <span className={styles.label}>Meta</span>
-          <span className={styles.value}>{formatCurrency(goal.targetAmount)}</span>
-        </div>
+      <div className={styles.goalInfo}>
+        <p>{formatCurrency(goal.current)} / <span>{formatCurrency(goal.goal)}</span></p>
+        <p>{progress.toFixed(1)}%</p>
       </div>
-      <div className={styles.actions}>
-        <button onClick={() => setIsAddMoneyModalOpen(true)} className={styles.actionButton}>+ Adicionar Dinheiro</button>
-      </div>
-
-      {isAddMoneyModalOpen && (
-        <AddMoneyModal 
-          onClose={() => setIsAddMoneyModalOpen(false)}
-          onSave={handleSaveMoney}
+      <div className={styles.saveMoneyContainer}>
+        <input 
+          type="number" 
+          value={amount} 
+          onChange={(e) => setAmount(e.target.value)} 
+          placeholder="Guardar dinheiro"
+          className={styles.saveInput}
         />
-      )}
+        <button onClick={() => handleSaveMoney(parseFloat(amount))} className={styles.saveButton}>Guardar</button>
+      </div>
     </div>
   );
 };

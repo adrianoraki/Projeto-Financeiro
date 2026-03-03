@@ -1,169 +1,125 @@
 
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../../../lib/AuthContext';
-import { db } from '../../../lib/firebase';
-import {
-  collection,
-  query,
-  where,
-  onSnapshot,
-} from 'firebase/firestore';
-import { getBudgets } from '../../../lib/budgetService';
-import { addTransaction } from '../../../lib/transactionService';
-import { processRecurringTransactions } from '../../../lib/recurringService';
-import styles from '../../../styles/DashboardPage.module.css';
+import { addTransaction, getTransactions } from '../../../lib/transactionsService'; // 1. IMPORTAR O SERVIÇO CORRETO
+import TransactionModal from '../../../components/TransactionModal';
 import DashboardHeader from '../../../components/DashboardHeader';
-import IncomeExpenseChart from '../../../components/IncomeExpenseChart';
 import BalanceChart from '../../../components/BalanceChart';
-import TransactionForm from '../../../components/TransactionForm';
+import IncomeExpenseChart from '../../../components/IncomeExpenseChart';
+import ExpensesPieChart from '../../../components/ExpensesPieChart';
+import GoalCard from '../../../components/GoalCard';
+import CdiCard from '../../../components/CdiCard';
+import InvestmentCard from '../../../components/InvestmentCard';
+import styles from '../../../styles/DashboardPage.module.css';
+import { Card, getCards, addCard } from '../../../lib/cardService';
 
 const DashboardPage = () => {
   const { user } = useAuth();
   const [transactions, setTransactions] = useState<any[]>([]);
-  const [budgets, setBudgets] = useState<any[]>([]);
-  const [showForm, setShowForm] = useState(false);
-  const [formType, setFormType] = useState<'income' | 'expense'>('income');
+  const [cards, setCards] = useState<Card[]>([]);
+  const [isModalOpen, setModalOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [saveError, setSaveError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [showForm, setShowForm] = useState(false);
+  const [formType, setFormType] = useState<'income' | 'expense'>('expense');
 
   useEffect(() => {
     if (user) {
-      processRecurringTransactions(user.uid);
-
-      const q = query(collection(db, 'transactions'), where('uid', '==', user.uid));
-      const unsubscribe = onSnapshot(q, (querySnapshot) => {
-        const transactionsData: any[] = [];
-        querySnapshot.forEach((doc) => {
-          transactionsData.push({ ...doc.data(), id: doc.id });
-        });
-        setTransactions(transactionsData);
-      });
-
-      const fetchBudgets = async () => {
-        const userBudgets = await getBudgets(user.uid);
-        setBudgets(userBudgets);
-      };
-      fetchBudgets();
-
-      return () => unsubscribe();
+      getTransactions(user.uid).then(setTransactions).catch(console.error);
+      getCards(user.uid).then(setCards).catch(console.error);
     }
   }, [user]);
 
-  const { totalIncome, totalExpenses, balance } = useMemo(() => {
-    const income = transactions
-      .filter(t => t.type === 'income')
-      .reduce((acc, t) => acc + t.amount, 0);
-    const expenses = transactions
-      .filter(t => t.type === 'expense')
-      .reduce((acc, t) => acc + t.amount, 0);
-    return { totalIncome: income, totalExpenses: expenses, balance: income - expenses };
-  }, [transactions]);
-
-  const handleAddIncome = () => {
-    setFormType('income');
-    setShowForm(true);
-  };
-
-  const handleAddExpense = () => {
-    setFormType('expense');
-    setShowForm(true);
-  };
-
-  const handleCloseForm = () => {
-    setShowForm(false);
-    setSaveError(null);
-  };
-
-  const handleSaveTransaction = async (transaction: {
-    description: string;
-    amount: number;
-    totalAmount?: number;
-    category: string;
-    installments?: number;
-    budgetId?: string;
-  }) => {
+  // 2. SUBSTITUIR A FUNÇÃO ANTIGA PELA CHAMADA AO SERVIÇO CENTRALIZADO
+  const handleSaveTransaction = async (transactionData: any) => {
     if (!user) return;
-
     setIsSaving(true);
-    setSaveError(null);
-
+    setError(null);
     try {
-      const { installments = 1, category, description, amount } = transaction;
-
-      if (category === 'Cartão' && installments > 1) {
-        for (let i = 0; i < installments; i++) {
-          const installmentDate = new Date();
-          installmentDate.setMonth(installmentDate.getMonth() + i);
-
-          await addTransaction({
-            ...transaction,
-            amount: amount, // Valor da parcela
-            description: `${description} (${i + 1}/${installments})`,
-            uid: user.uid,
-            type: formType,
-            date: installmentDate.toISOString().split('T')[0],
-            installmentNumber: i + 1,
-            totalInstallments: installments,
-          });
-        }
-      } else {
-        await addTransaction({
-          ...transaction,
-          uid: user.uid,
-          type: formType,
-          date: new Date().toISOString().split('T')[0],
-        });
-      }
-
-      const userBudgets = await getBudgets(user.uid);
-      setBudgets(userBudgets);
-      handleCloseForm(); // Fecha o formulário apenas em caso de sucesso
-
-    } catch (error) {
-      console.error('Falha ao salvar transação:', error);
-      setSaveError('Não foi possível salvar a transação. Verifique as permissões do banco de dados (regras de segurança) e tente novamente.');
+      const dataWithUid = { ...transactionData, uid: user.uid };
+      await addTransaction(dataWithUid);
+      // Atualiza a lista de transações após salvar
+      const updatedTransactions = await getTransactions(user.uid);
+      setTransactions(updatedTransactions);
+      setShowForm(false);
+      setModalOpen(false);
+    } catch (err) {
+      console.error("Error adding transaction from dashboard: ", err);
+      setError("Não foi possível salvar a transação. Verifique os dados e tente novamente.");
     } finally {
       setIsSaving(false);
     }
   };
 
-  if (!user) {
-    return <p>Carregando...</p>;
-  }
+  const handleAddCard = async (newCard: Omit<Card, 'id' | 'uid'>) => {
+    if (!user) return;
+    try {
+        await addCard({ ...newCard, uid: user.uid });
+        const updatedCards = await getCards(user.uid);
+        setCards(updatedCards);
+    } catch (error) {
+        console.error("Error adding card: ", error);
+        // Handle error appropriately
+    }
+  };
+
+  const openModalWithForm = (type: 'income' | 'expense') => {
+    setFormType(type);
+    setShowForm(true);
+    setModalOpen(true);
+    setError(null);
+  };
+
+  // DUMMY DATA - Replace with real data
+  const goals = [{ id: '1', title: 'Viagem para a Praia', current: 750, goal: 1000 }];
+  const cdiRate = 11.65; // Example CDI rate
+  const investments = { total: 12500, performance: 5.8 };
 
   return (
     <div className={styles.container}>
-      <DashboardHeader
-        totalIncome={totalIncome}
-        totalExpenses={totalExpenses}
-        balance={balance}
-        onAddIncome={handleAddIncome}
-        onAddExpense={handleAddExpense}
+      <DashboardHeader 
+        userName={user?.displayName || 'Usuário'} 
+        onAddIncome={() => openModalWithForm('income')}
+        onAddExpense={() => openModalWithForm('expense')}
       />
-
-      <div className={styles.chartsGrid}>
-        <div className={styles.chartContainer}>
-          <h3>Receitas vs Despesas (Mensal)</h3>
-          <IncomeExpenseChart transactions={transactions} />
-        </div>
-        <div className={styles.chartContainer}>
-          <h3>Evolução do Patrimônio</h3>
+      
+      <main className={styles.mainGrid}>
+        <section className={styles.chartSection}>
           <BalanceChart transactions={transactions} />
-        </div>
-      </div>
+        </section>
+        <section className={styles.chartSection}>
+          <IncomeExpenseChart transactions={transactions} />
+        </section>
+        <section className={styles.chartSection}>
+          <ExpensesPieChart transactions={transactions} />
+        </section>
+        <section className={styles.cardSection}>
+          <GoalCard goal={goals[0]} />
+        </section>
+        <section className={styles.cardSection}>
+          <CdiCard cdiRate={cdiRate} />
+        </section>
+        <section className={styles.cardSection}>
+          <InvestmentCard investments={investments} />
+        </section>
+      </main>
 
-      {showForm && (
-        <TransactionForm
-          type={formType}
-          onClose={handleCloseForm}
-          onSave={handleSaveTransaction}
-          budgets={budgets}
-          isSaving={isSaving}
-          error={saveError}
-        />
-      )}
+      <TransactionModal
+        isOpen={isModalOpen}
+        onClose={() => setModalOpen(false)}
+        transactions={[]}
+        selectedDate={new Date().toISOString().split('T')[0]}
+        showForm={showForm}
+        formType={formType}
+        onSave={handleSaveTransaction} // 3. GARANTIR QUE O onSave CORRETO ESTÁ SENDO USADO
+        isSaving={isSaving}
+        error={error}
+        setShowForm={setShowForm}
+        cards={cards}
+        onCardAdd={handleAddCard}
+      />
     </div>
   );
 };

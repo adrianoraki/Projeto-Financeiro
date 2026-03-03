@@ -52,6 +52,26 @@ O FinanceApp adota um design **dark theme (tema escuro)**, moderno e sofisticado
 
 O projeto utiliza *Route Groups* do Next.js para uma organização lógica: `app/(main)` para páginas principais e `app/login` para a autenticação.
 
+## Atualização do Modal de Transações (Sessão Atual)
+
+Nesta sessão, o foco foi aprimorar o modal de cadastro de transações, adicionando um sistema de categorização mais robusto e detalhado para receitas e despesas.
+
+1.  **Problema:** O formulário de transações era simples e não permitia uma classificação detalhada, dificultando a análise financeira posterior.
+
+2.  **Solução Implementada:**
+    *   **Estrutura de Categorias:** Foi implementada uma nova estrutura de "Grupo" e "Sub-grupo" com base na especificação detalhada fornecida pelo usuário. Essa estrutura abrange diversas fontes de receita e naturezas de despesa (essenciais, supérfluos, por meio de pagamento, etc.).
+    *   **Novo Componente de Formulário (`TransactionForm.tsx`):** Para manter a organização do código, foi criado um componente React dedicado exclusivamente ao formulário de adição de transações.
+        *   Este formulário inclui campos para descrição, valor, tipo (receita/despesa) e os novos seletores de "Grupo" and "Sub-grupo".
+    *   **Integração com o Modal (`TransactionModal.tsx`):**
+        *   O modal existente foi modificado para incluir um botão "Adicionar Transação".
+        *   Ao clicar neste botão, o novo `TransactionForm` é exibido ou ocultado dentro do próprio modal, sem alterar o layout principal da página.
+    *   **Dropdowns Dinâmicos:** O seletor de "Sub-grupo" é populado dinamicamente com as opções correspondentes ao "Grupo" selecionado, garantindo uma experiência de usuário fluida e evitando combinações inválidas.
+    *   **Estilização:** Foram criados e aplicados estilos (`TransactionForm.module.css` e ajustes em `TransactionModal.module.css`) para garantir que o novo formulário e o botão de ação estejam visualmente alinhados com o design *dark theme* da aplicação.
+
+3.  **Estado Atual:**
+    *   A interface do modal foi completamente atualizada conforme solicitado.
+    *   A lógica de submissão do formulário, por enquanto, apenas exibe os dados no console do navegador. O próximo passo será conectar este formulário ao serviço do Firestore para salvar as novas transações no banco de dados.
+
 ## Histórico de Correções (Sessão Recente)
 
 Esta seção documenta a resolução de um bug crítico relacionado à funcionalidade "Meus Cartões".

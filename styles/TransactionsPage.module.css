@@ -1,7 +1,7 @@
 
 .container {
     background-color: #1a1a2e;
-    padding: 0.5rem; /* Reduzido de 1rem para 0.5rem */
+    padding: 1rem;
     border-radius: 15px;
     color: #e0e0e0;
 }
@@ -10,7 +10,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 0.5rem; /* Reduzido de 1rem para 0.5rem */
+    margin-bottom: 1.5rem;
 }
 
 .addButton {
@@ -49,20 +49,21 @@
 }
 
 .transactionItem {
-    display: flex;
+    display: grid;
+    grid-template-columns: auto 1fr auto auto;
     align-items: center;
-    justify-content: space-between;
+    gap: 1rem;
     background-color: #2c2c3e;
     padding: 1rem;
     border-radius: 8px;
-    border-left: 5px solid transparent;
+    border-left: 5px solid;
 }
 
-.income .transactionDetails {
+.income {
     border-left-color: #28a745;
 }
 
-.expense .transactionDetails {
+.expense {
     border-left-color: #dc3545;
 }
 
@@ -70,45 +71,52 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    margin-right: 1rem;
 }
 
 .statusToggle input[type="checkbox"] {
     cursor: pointer;
+    accent-color: #4caf50;
+    width: 18px;
+    height: 18px;
 }
 
 .statusToggle label {
     font-size: 0.9rem;
     font-weight: 500;
-}
-
-.transactionDetails {
-    flex-grow: 1;
+    user-select: none;
 }
 
 .transactionDetails span {
     display: block;
     font-size: 1.1rem;
+    font-weight: 500;
 }
 
 .transactionDetails small {
     color: #a0a0a0;
+    font-size: 0.85rem;
+}
+
+.paymentSelector {
+    padding: 6px 10px;
+    border-radius: 5px;
+    border: 1px solid #444;
+    background-color: #1a1a2e;
+    color: #e0e0e0;
+    font-size: 0.9rem;
+    max-width: 180px;
+    cursor: pointer;
+}
+
+.paymentSelector:hover {
+    border-color: #666;
 }
 
 .transactionAmount {
     display: flex;
     align-items: center;
     gap: 1rem;
-}
-
-.transactionAmount span.income {
-    color: #28a745;
-    font-weight: bold;
-}
-
-.transactionAmount span.expense {
-    color: #dc3545;
-    font-weight: bold;
+    text-align: right;
 }
 
 .deleteButton {
@@ -118,12 +126,14 @@
     font-size: 1.2rem;
     cursor: pointer;
     transition: color 0.3s ease;
+    padding: 0 5px;
 }
 
 .deleteButton:hover {
     color: #ff1a1a;
 }
 
+/* Modal & Form Styles */
 .modal {
     position: fixed;
     top: 0;
@@ -139,88 +149,112 @@
 
 .modalContent {
     background-color: #2c2c3e;
-    padding: 1.2rem;
+    padding: 1.5rem 2rem 2rem;
     border-radius: 10px;
     width: 90%;
-    max-width: 400px;
+    max-width: 450px;
     position: relative;
-    /* max-height e overflow removidos para altura natural */
 }
 
 .modalContent h2 {
-    margin-top: 0;
-    margin-bottom: 1rem;
-    font-size: 1.1rem;
+    margin: 0 0 1.5rem 0;
+    font-size: 1.3rem;
+    text-align: center;
 }
 
 .closeButton {
     position: absolute;
-    top: 10px;
-    right: 12px;
-    font-size: 1.4rem;
+    top: 15px;
+    right: 20px;
+    font-size: 1.8rem;
     cursor: pointer;
+    color: #aaa;
+    line-height: 1;
+}
+.closeButton:hover {
+    color: #fff;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
 }
 
 .formGroup {
-    margin-bottom: 0.5rem; /* Margem bem reduzida */
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
 }
 
 .formGroup label {
-    display: block;
-    margin-bottom: 0.2rem;
     font-size: 0.85rem;
+    color: #ccc;
 }
 
 .formGroup input,
 .formGroup select {
     width: 100%;
-    padding: 5px 8px; /* Padding bem reduzido */
+    padding: 8px;
     border-radius: 5px;
-    border: 1px solid #333;
+    border: 1px solid #444;
     background-color: #1a1a2e;
     color: #e0e0e0;
-    font-size: 0.9rem;
+    font-size: 0.95rem;
 }
 
 .radioGroup {
     display: flex;
-    gap: 0.8rem;
+    gap: 1rem;
+    align-items: center;
+    padding: 4px 0;
 }
 
-.typeButton {
-    flex: 1;
-    padding: 7px; /* Padding reduzido */
-    border-radius: 5px;
-    border: 1px solid #333;
-    background-color: transparent;
-    color: #e0e0e0;
+.radioGroup label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
     cursor: pointer;
-    transition: background-color 0.3s ease, border-color 0.3s ease;
+    font-size: 0.95rem;
 }
 
-.typeButton.activeIncome {
-    background-color: #28a745;
-    border-color: #28a745;
+.buttonGroup {
+    display: flex;
+    gap: 1rem;
+    margin-top: 0.8rem;
+    justify-content: flex-end;
 }
 
-.typeButton.activeExpense {
-    background-color: #dc3545;
-    border-color: #dc3545;
-}
-
-.submitButton {
-    width: 100%;
-    padding: 9px;
-    margin-top: 1rem;
+.submitButton, .cancelButton {
+    padding: 9px 18px;
     border-radius: 5px;
     border: none;
-    background-color: #007bff;
-    color: white;
-    font-size: 1rem;
+    font-size: 0.95rem;
+    font-weight: 500;
     cursor: pointer;
     transition: background-color 0.3s ease;
 }
 
-.submitButton:hover {
-    background-color: #0056b3;
+.submitButton {
+    background-color: #007bff;
+    color: white;
+}
+.cancelButton {
+    background-color: #555;
+    color: #eee;
+}
+
+.submitButton:disabled, .cancelButton:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.error {
+    color: #ff4d4d;
+    background-color: rgba(255, 77, 77, 0.1);
+    border: 1px solid #ff4d4d;
+    padding: 1rem;
+    border-radius: 5px;
+    text-align: center;
+    margin-bottom: 1.5rem;
 }

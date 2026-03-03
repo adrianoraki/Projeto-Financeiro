@@ -1,3 +1,4 @@
+
 .container {
     padding: 2rem;
     background-color: #f0f2f5;
@@ -49,19 +50,41 @@
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     transition: transform 0.2s;
     position: relative;
+    border-left: 5px solid #007bff; /* Default border color */
   }
+
+  .card.creditCard { border-left-color: #1a73e8; }
+  .card.pix { border-left-color: #34a853; }
+  .card.boleto { border-left-color: #ff5722; }
+  .card.debit { border-left-color: #9c27b0; }
   
   .card:hover {
     transform: translateY(-5px);
   }
-
-  .card.disabled {
-    opacity: 0.5;
-    pointer-events: none;
-  }
   
+  .cardHeader {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .cardIcon {
+    font-size: 1.8rem;
+  }
+
+  .creditCard .cardIcon { color: #1a73e8; }
+  .pix .cardIcon { color: #34a853; }
+  .boleto .cardIcon { color: #ff5722; }
+  .debit .cardIcon { color: #9c27b0; }
+
+  .cardBody p {
+      margin: 0.3rem 0;
+      color: #555;
+  }
+
   .card h3 {
-    margin-top: 0;
+    margin: 0;
     font-size: 1.25rem;
   }
   
