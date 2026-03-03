@@ -1,15 +1,14 @@
 
 import { NextResponse } from 'next/server';
-import { db } from '../../../lib/firebase-admin'; // Usaremos o SDK Admin no lado do servidor
-import { getAuth } from 'firebase-admin/auth';
+import { getDb, getAuthAdmin } from '@/lib/firebase-admin'; 
 
-// Função para verificar o token de autenticação
 async function verifyAuth(request: Request) {
   const idToken = request.headers.get('Authorization')?.split('Bearer ')[1];
   if (!idToken) {
     throw new Error('No token provided');
   }
-  const decodedToken = await getAuth().verifyIdToken(idToken);
+  // Chama a função para obter a instância do auth
+  const decodedToken = await getAuthAdmin().verifyIdToken(idToken);
   return decodedToken.uid;
 }
 
@@ -31,7 +30,8 @@ export async function POST(request: Request) {
       createdAt: new Date(),
     };
 
-    const cardRef = await db.collection('cards').add(cardData);
+    // Chama a função para obter a instância do db
+    const cardRef = await getDb().collection('cards').add(cardData);
 
     return NextResponse.json({ id: cardRef.id, ...cardData }, { status: 201 });
   } catch (error) {
