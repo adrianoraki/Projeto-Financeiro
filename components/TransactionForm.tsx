@@ -6,13 +6,15 @@ import { getCards, CreditCard } from '../lib/cardsService';
 import { useAuth } from '../lib/AuthContext';
 
 interface TransactionFormProps {
-  onSave: (transaction: any) => void;
+  onSave: (transaction: any) => Promise<void>;
   onClose: () => void;
   type: 'income' | 'expense';
   budgets: any[];
+  isSaving: boolean;
+  error: string | null;
 }
 
-const TransactionForm: React.FC<TransactionFormProps> = ({ onSave, onClose, type, budgets }) => {
+const TransactionForm: React.FC<TransactionFormProps> = ({ onSave, onClose, type, budgets, isSaving, error }) => {
   const { user } = useAuth();
   const [description, setDescription] = useState('');
   const [amount, setAmount] = useState('');
@@ -35,9 +37,9 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ onSave, onClose, type
     }
   }, [user]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    onSave({
+    await onSave({
       description,
       amount: parseFloat(amount),
       type,
@@ -157,10 +159,12 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ onSave, onClose, type
             </div>
           )}
 
+          {error && <p className={styles.error}>{error}</p>}
+
           <div className={styles.formActions}>
-            <button type="button" onClick={onClose} className={styles.cancelButton}>Cancelar</button>
-            <button type="submit" className={`${styles.saveButton} ${isIncome ? styles.income : styles.expense}`}>
-              {isIncome ? 'Adicionar Receita' : 'Adicionar Despesa'}
+            <button type="button" onClick={onClose} className={styles.cancelButton} disabled={isSaving}>Cancelar</button>
+            <button type="submit" className={`${styles.saveButton} ${isIncome ? styles.income : styles.expense}`} disabled={isSaving}>
+              {isSaving ? 'Salvando...' : (isIncome ? 'Adicionar Receita' : 'Adicionar Despesa')}
             </button>
           </div>
         </form>

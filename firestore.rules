@@ -1,11 +1,15 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /creditCards/{cardId} {
-      // Allow create if the new document's uid matches the user's uid
-      allow create: if request.auth.uid == request.resource.data.uid;
-      // Allow read, update, delete if the user is the owner of the existing document
-      allow read, update, delete: if request.auth.uid == resource.data.uid;
+    // Helper function to check ownership
+    function isOwner(userId) {
+      return request.auth.uid == userId;
+    }
+
+    // Generic rule for user-owned resources
+    match /{collection}/{docId} where collection in ['transactions', 'budgets', 'goals', 'recurringTransactions', 'cards'] {
+      allow read, write: if request.auth != null && isOwner(request.resource.data.uid);
+      allow create: if request.auth != null;
     }
   }
 }

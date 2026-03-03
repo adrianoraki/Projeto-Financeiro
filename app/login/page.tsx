@@ -3,18 +3,14 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import {
-  signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
-  signInWithPopup,
-} from 'firebase/auth';
+import Link from 'next/link';
+import { signInWithEmailAndPassword, signInWithPopup, signOut } from 'firebase/auth';
 import { auth, provider } from '../../lib/firebase';
 import { useAuth } from '../../lib/AuthContext';
 import styles from '../../styles/Auth.module.css';
 
-export default function AuthPage() {
+export default function LoginPage() {
   const { user } = useAuth();
-  const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -29,24 +25,23 @@ export default function AuthPage() {
     }
   }, [user, router]);
 
-  const handleAuthAction = async (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
 
     try {
-      if (isLogin) {
-        await signInWithEmailAndPassword(auth, email, password);
-      } else {
-        await createUserWithEmailAndPassword(auth, email, password);
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      
+      if (!userCredential.user.emailVerified) {
+        await signOut(auth); // Desloga o usuário
+        setError('Seu e-mail ainda não foi verificado. Por favor, cheque sua caixa de entrada e clique no link de confirmação.');
+        return;
       }
-      // O redirecionamento será tratado pelo useEffect
+      // Se o e-mail for verificado, o useEffect cuidará do redirecionamento.
+
     } catch (error) {
-      if (isLogin) {
-        setError('Falha ao entrar. Verifique suas credenciais.');
-      } else {
-        setError('Falha ao registrar. Tente novamente.');
-      }
-      console.error('Authentication error: ', error);
+      setError('Falha ao entrar. Verifique seu e-mail e senha.');
+      console.error('Login error: ', error);
     }
   };
 
@@ -54,7 +49,7 @@ export default function AuthPage() {
     setError(null);
     try {
       await signInWithPopup(auth, provider);
-      // O redirecionamento será tratado pelo useEffect
+      // O useEffect cuidará do redirecionamento após o login com Google.
     } catch (error) {
       setError('Falha ao entrar com o Google. Tente novamente.');
       console.error('Error with Google sign in: ', error);
@@ -69,8 +64,8 @@ export default function AuthPage() {
     <div className={styles.container}>
       <div className={styles.backgroundImage} />
       <div className={styles.formContainer}>
-        <h1>{isLogin ? 'Login' : 'Registrar'}</h1>
-        <form onSubmit={handleAuthAction}>
+        <h1>Login</h1>
+        <form onSubmit={handleLogin}>
           <input
             type="email"
             placeholder="E-mail"
@@ -85,7 +80,7 @@ export default function AuthPage() {
             onChange={(e) => setPassword(e.target.value)}
             required
           />
-          <button type="submit">{isLogin ? 'Entrar' : 'Registrar'}</button>
+          <button type="submit">Entrar</button>
           {error && <p className={styles.error}>{error}</p>}
         </form>
 
@@ -98,10 +93,8 @@ export default function AuthPage() {
         </button>
 
         <p>
-          {isLogin ? 'Não tem uma conta?' : 'Já tem uma conta?'}{' '}
-          <a href="#" onClick={(e) => { e.preventDefault(); setIsLogin(!isLogin); }}>
-            {isLogin ? 'Registre-se aqui' : 'Faça login aqui'}
-          </a>
+          Não tem uma conta?{' '}
+          <Link href="/register">Registre-se aqui</Link>
         </p>
       </div>
     </div>

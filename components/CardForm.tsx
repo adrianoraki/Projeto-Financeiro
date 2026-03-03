@@ -11,11 +11,14 @@ interface CardFormProps {
 const CardForm: React.FC<CardFormProps> = ({ onSave, onClose }) => {
   const [name, setName] = useState('');
   const [brand, setBrand] = useState('Visa');
+  const [otherBrand, setOtherBrand] = useState(''); // State for the custom brand
   const [invoiceDueDate, setInvoiceDueDate] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSave({ name, brand, invoiceDueDate: Number(invoiceDueDate) });
+    // If brand is 'Outros', use the custom brand name, otherwise use the selected brand
+    const finalBrand = brand === 'Outros' ? otherBrand : brand;
+    onSave({ name, brand: finalBrand, invoiceDueDate: Number(invoiceDueDate) });
   };
 
   return (
@@ -38,6 +41,20 @@ const CardForm: React.FC<CardFormProps> = ({ onSave, onClose }) => {
                     <option value="Outros">Outros</option>
                 </select>
             </div>
+
+            {/* Conditionally render this input field if brand is 'Outros' */}
+            {brand === 'Outros' && (
+              <div className={styles.formGroup}>
+                <label>Qual bandeira?</label>
+                <input 
+                  type="text" 
+                  value={otherBrand} 
+                  onChange={(e) => setOtherBrand(e.target.value)} 
+                  placeholder="Digite o nome da bandeira"
+                  required
+                />
+              </div>
+            )}
 
             <div className={styles.formGroup}>
                 <label>Dia do Vencimento da Fatura</label>

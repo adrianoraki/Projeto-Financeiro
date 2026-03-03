@@ -25,6 +25,8 @@ const DashboardPage = () => {
   const [budgets, setBudgets] = useState<any[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [formType, setFormType] = useState<'income' | 'expense'>('income');
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   useEffect(() => {
     if (user) {
@@ -71,6 +73,7 @@ const DashboardPage = () => {
 
   const handleCloseForm = () => {
     setShowForm(false);
+    setSaveError(null);
   };
 
   const handleSaveTransaction = async (transaction: {
@@ -83,38 +86,47 @@ const DashboardPage = () => {
   }) => {
     if (!user) return;
 
-    const { installments = 1, category, description, amount } = transaction;
+    setIsSaving(true);
+    setSaveError(null);
 
-    if (category === 'Cartão' && installments > 1) {
-      // Cria múltiplas transações para compras parceladas
-      for (let i = 0; i < installments; i++) {
-        const installmentDate = new Date();
-        installmentDate.setMonth(installmentDate.getMonth() + i);
+    try {
+      const { installments = 1, category, description, amount } = transaction;
 
+      if (category === 'Cartão' && installments > 1) {
+        for (let i = 0; i < installments; i++) {
+          const installmentDate = new Date();
+          installmentDate.setMonth(installmentDate.getMonth() + i);
+
+          await addTransaction({
+            ...transaction,
+            amount: amount, // Valor da parcela
+            description: `${description} (${i + 1}/${installments})`,
+            uid: user.uid,
+            type: formType,
+            date: installmentDate.toISOString().split('T')[0],
+            installmentNumber: i + 1,
+            totalInstallments: installments,
+          });
+        }
+      } else {
         await addTransaction({
           ...transaction,
-          amount: amount, // Valor da parcela
-          description: `${description} (${i + 1}/${installments})`,
           uid: user.uid,
           type: formType,
-          date: installmentDate.toISOString().split('T')[0],
-          installmentNumber: i + 1,
-          totalInstallments: installments,
+          date: new Date().toISOString().split('T')[0],
         });
       }
-    } else {
-      // Salva uma única transação
-      await addTransaction({
-        ...transaction,
-        uid: user.uid,
-        type: formType,
-        date: new Date().toISOString().split('T')[0],
-      });
-    }
 
-    // Atualiza os orçamentos após salvar
-    const userBudgets = await getBudgets(user.uid);
-    setBudgets(userBudgets);
+      const userBudgets = await getBudgets(user.uid);
+      setBudgets(userBudgets);
+      handleCloseForm(); // Fecha o formulário apenas em caso de sucesso
+
+    } catch (error) {
+      console.error('Falha ao salvar transação:', error);
+      setSaveError('Não foi possível salvar a transação. Verifique as permissões do banco de dados (regras de segurança) e tente novamente.');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   if (!user) {
@@ -148,6 +160,8 @@ const DashboardPage = () => {
           onClose={handleCloseForm}
           onSave={handleSaveTransaction}
           budgets={budgets}
+          isSaving={isSaving}
+          error={saveError}
         />
       )}
     </div>

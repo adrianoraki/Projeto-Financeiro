@@ -15,6 +15,11 @@
     font-size: 2rem;
     color: #333;
   }
+
+  .headerActions {
+    display: flex;
+    align-items: center;
+  }
   
   .addButton {
     background-color: #007bff;
@@ -83,4 +88,52 @@
       border-radius: 5px;
       margin-bottom: 1rem;
   }
+
+  /* Tooltip Styles */
+  .tooltipContainer {
+    position: relative;
+    display: flex;
+    align-items: center;
+    margin-left: 12px;
+  }
   
+  .tooltipIcon {
+    cursor: pointer;
+    width: 22px;
+    height: 22px;
+    color: #666;
+  }
+  
+  .tooltipText {
+    visibility: hidden;
+    width: 240px;
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 8px 12px;
+    position: absolute;
+    z-index: 1;
+    bottom: 135%; 
+    left: 50%;
+    margin-left: -120px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    font-size: 0.85rem;
+  }
+  
+  .tooltipText::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #333 transparent transparent transparent;
+  }
+  
+  .tooltipContainer:hover .tooltipText {
+    visibility: visible;
+    opacity: 1;
+  }

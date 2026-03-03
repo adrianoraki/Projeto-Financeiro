@@ -42,6 +42,13 @@ const TransactionsPage = () => {
     }
   }, [user]);
 
+  // Effect to reset status filter when main filter changes from 'expense'
+  useEffect(() => {
+    if (filter !== 'expense') {
+        setStatusFilter('all');
+    }
+  }, [filter]);
+
   useEffect(() => {
     let filtered = [...transactions];
 
@@ -50,9 +57,9 @@ const TransactionsPage = () => {
       filtered = filtered.filter(t => t.type === filter);
     }
 
-    // Filtering by status
-    if (statusFilter !== 'all') {
-        filtered = filtered.filter(t => t.type === 'income' || t.status === statusFilter);
+    // CORRECTED: Filtering by status, only applies when viewing expenses
+    if (filter === 'expense' && statusFilter !== 'all') {
+        filtered = filtered.filter(t => t.status === statusFilter);
     }
 
     // Sorting
@@ -81,55 +88,81 @@ const TransactionsPage = () => {
 
   const handleAddTransaction = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user) return;
-
-    const amountNumber = parseFloat(amount);
-    const transactionDate = new Date(date);
-    const newTransaction: any = {
-        uid: user.uid,
-        description,
-        amount: amountNumber,
-        date,
-        type,
-        category,
-        paymentMethod,
-        createdAt: serverTimestamp(),
-      };
-  
-      if (type === 'expense') {
-        newTransaction.status = 'pending'; // Default status for expenses
-      }
-
-    if (installments > 1 && (paymentMethod === 'Cartão' || paymentMethod === 'Pix')) {
-      const installmentAmount = Math.floor((amountNumber / installments) * 100) / 100;
-      for (let i = 0; i < installments; i++) {
-        const installmentDate = new Date(transactionDate);
-        installmentDate.setMonth(installmentDate.getMonth() + i);
-        
-        await addDoc(collection(db, 'transactions'), {
-          ...newTransaction,
-          description: `${description} (${i + 1}/${installments})`,
-          amount: installmentAmount,
-          date: installmentDate.toISOString().split('T')[0],
-        });
-      }
-    } else {
-      await addDoc(collection(db, 'transactions'), newTransaction);
+    if (!user) {
+        alert("Você precisa estar logado para adicionar uma transação.");
+        return;
     }
+
+    try {
+        const amountNumber = parseFloat(amount);
+        if (isNaN(amountNumber) || amountNumber <= 0) {
+            alert("Por favor, insira um valor válido.");
+            return;
+        }
+
+        const transactionDate = new Date(date);
+        const newTransaction: any = {
+            uid: user.uid,
+            description,
+            amount: amountNumber,
+            date,
+            type,
+            category,
+            paymentMethod,
+            createdAt: serverTimestamp(),
+        };
     
-    resetForm();
-    setModalOpen(false);
+        if (type === 'expense') {
+            newTransaction.status = 'pending'; // Default status for expenses
+        }
+
+        if (installments > 1 && (paymentMethod === 'Cartão' || paymentMethod === 'Pix')) {
+            const installmentAmount = Math.floor((amountNumber / installments) * 100) / 100;
+            const promises = [];
+            for (let i = 0; i < installments; i++) {
+                const installmentDate = new Date(transactionDate);
+                installmentDate.setMonth(installmentDate.getMonth() + i);
+                
+                promises.push(addDoc(collection(db, 'transactions'), {
+                ...newTransaction,
+                description: `${description} (${i + 1}/${installments})`,
+                amount: installmentAmount,
+                date: installmentDate.toISOString().split('T')[0],
+                }));
+            }
+            await Promise.all(promises);
+        } else {
+            await addDoc(collection(db, 'transactions'), newTransaction);
+        }
+        
+        resetForm();
+        setModalOpen(false);
+
+    } catch (error) {
+        console.error("Erro ao adicionar transação: ", error);
+        alert("Ocorreu um erro ao salvar a transação. Verifique os dados e tente novamente.");
+    }
   };
 
   const handleDeleteTransaction = async (id: string) => {
     if (window.confirm("Tem certeza que deseja excluir esta transação?")) {
-      await deleteDoc(doc(db, 'transactions', id));
+      try {
+        await deleteDoc(doc(db, 'transactions', id));
+      } catch (error) {
+        console.error("Erro ao deletar transação: ", error);
+        alert("Ocorreu um erro ao deletar a transação.");
+      }
     }
   }
 
   const handleStatusChange = async (id: string, currentStatus: string) => {
     const newStatus = currentStatus === 'paid' ? 'pending' : 'paid';
-    await updateDoc(doc(db, 'transactions', id), { status: newStatus });
+    try {
+        await updateDoc(doc(db, 'transactions', id), { status: newStatus });
+    } catch (error) {
+        console.error("Erro ao atualizar status: ", error);
+        alert("Ocorreu um erro ao atualizar o status.");
+    }
   };
 
 
@@ -143,8 +176,38 @@ const TransactionsPage = () => {
     setInstallments(1);
   }
 
-  const expenseCategories = ['Alimentação', 'Moradia', 'Transporte', 'Lazer', 'Cartão', 'Empréstimos', 'Vestuário', 'Saúde', 'Serviços', 'Outros'];
-  const incomeCategories = ['Salário', 'Freelance', 'Investimentos', 'Outros'];
+  const incomeCategories = ['Salário', 'Bonificação', 'Extra', 'Venda de Ativos', 'Comissão', 'Consultoria', 'Aluguéis', 'Rendimentos', 'Metas'];
+
+  const expenseCategories = [
+    { 
+      group: 'Gastos Essenciais',
+      options: ['Moradia', 'Alimentação', 'Saúde', 'Educação', 'Transporte', 'Contas de Consumo']
+    },
+    {
+      group: 'Lazer e Estilo de Vida',
+      options: ['Restaurantes', 'Compras', 'Viagens', 'Assinaturas e Serviços', 'Cuidados Pessoais']
+    },
+    {
+      group: 'Investimentos e Metas',
+      options: ['Aporte em Corretora', 'Compra de Cripto', 'Cursos e Capacitação', 'Equipamentos']
+    },
+    {
+      group: 'Outras Despesas',
+      options: ['Impostos e Taxas', 'Doações', 'Empréstimos', 'Outros']
+    }
+  ];
+
+  const renderCategoryOptions = () => {
+    if (type === 'income') {
+      return incomeCategories.map(cat => <option key={cat} value={cat}>{cat}</option>);
+    } else {
+      return expenseCategories.map(categoryGroup => (
+        <optgroup key={categoryGroup.group} label={categoryGroup.group}>
+          {categoryGroup.options.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+        </optgroup>
+      ));
+    }
+  };
 
   return (
     <div className={styles.container}>
@@ -215,7 +278,6 @@ const TransactionsPage = () => {
             <span onClick={() => setModalOpen(false)} className={styles.closeButton}>&times;</span>
             <h2>Adicionar Nova Transação</h2>
             <form onSubmit={handleAddTransaction}>
-                {/* Form fields remain the same */}
                  <div className={styles.formGroup}>
                 <label>Tipo</label>
                 <div className={styles.radioGroup}>
@@ -239,9 +301,7 @@ const TransactionsPage = () => {
                 <label>Categoria</label>
                 <select value={category} onChange={(e) => setCategory(e.target.value)} required>
                   <option value="">Selecione uma categoria</option>
-                  {(type === 'expense' ? expenseCategories : incomeCategories).map(cat => (
-                    <option key={cat} value={cat}>{cat}</option>
-                  ))}
+                  {renderCategoryOptions()}
                 </select>
               </div>
               <div className={styles.formGroup}>

@@ -34,7 +34,8 @@
   margin-bottom: 1.5rem;
 }
 
-.formContainer input {
+.formContainer input,
+.formContainer select {
   display: block;
   width: 100%;
   padding: 0.75rem;
@@ -58,6 +59,84 @@
 .formContainer button:hover {
   background-color: #005bb5;
 }
+
+/* Container for the optional button and tooltip icon */
+.optionalButtonContainer {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* Creates space between the button and the icon */
+  width: 100%;
+  margin-bottom: 1rem; /* THIS SEPARATES IT FROM THE REGISTER BUTTON */
+}
+
+.optionalButton {
+  width: auto; /* Let the button size naturally */
+  flex-grow: 1; /* Allow the button to take the remaining space */
+  margin-bottom: 0 !important; /* The container handles the margin */
+}
+
+.cardForm {
+  margin-top: 1.5rem;
+  margin-bottom: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid #ddd;
+}
+
+.cardForm h3 {
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+/* --- Tooltip Styles --- */
+.tooltipContainer {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.tooltipIcon {
+  cursor: pointer;
+  width: 24px;
+  height: 24px;
+  color: #555;
+}
+
+.tooltipText {
+  visibility: hidden;
+  width: 260px;
+  background-color: #333;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 10px;
+  position: absolute;
+  z-index: 10;
+  bottom: 140%;
+  left: 50%;
+  transform: translateX(-50%); /* Perfect centering */
+  opacity: 0;
+  transition: opacity 0.3s;
+  font-size: 0.875rem;
+  line-height: 1.4;
+  pointer-events: none;
+}
+
+.tooltipText::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: #333 transparent transparent transparent;
+}
+
+.tooltipContainer:hover .tooltipText {
+  visibility: visible;
+  opacity: 1;
+}
+/* --- End of Tooltip Styles --- */
 
 .googleButton {
   background-color: #4285F4 !important; 

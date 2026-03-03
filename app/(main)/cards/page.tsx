@@ -7,6 +7,13 @@ import CardForm from '../../../components/CardForm';
 import styles from '../../../styles/CardsPage.module.css';
 import { FaTrash } from 'react-icons/fa';
 
+// SVG Icon for the tooltip
+const InfoIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={styles.tooltipIcon}>
+    <path fillRule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm8.706-1.442c0-.662.538-1.2 1.2-1.2s1.2.538 1.2 1.2v5.25c0 .662-.538 1.2-1.2 1.2s-1.2-.538-1.2-1.2V10.558zM12 7.5a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" clipRule="evenodd" />
+  </svg>
+);
+
 const CardsPage = () => {
   const { user } = useAuth();
   const [cards, setCards] = useState<CreditCard[]>([]);
@@ -53,7 +60,6 @@ const CardsPage = () => {
           uid: user.uid 
       });
 
-      // Replace the optimistic card with the real one from the server
       setCards(prevCards => 
         prevCards.map(card => 
           card.id === tempId ? savedCard : card
@@ -63,7 +69,6 @@ const CardsPage = () => {
     } catch (err) {
       console.error("Erro ao salvar o cartão:", err);
       setError('Ocorreu um erro ao salvar o cartão. A alteração foi desfeita.');
-      // If the save fails, revert the optimistic update
       setCards(prevCards => prevCards.filter(card => card.id !== tempId));
     }
   };
@@ -85,7 +90,17 @@ const CardsPage = () => {
     <div className={styles.container}>
       <div className={styles.header}>
         <h1>Meus Cartões</h1>
-        <button onClick={() => { setIsModalOpen(true); setError(null); }} className={styles.addButton}>+ Adicionar Cartão</button>
+        <div className={styles.headerActions}>
+          <button onClick={() => { setIsModalOpen(true); setError(null); }} className={styles.addButton}>
+            {cards.length === 0 ? '+ Adicionar primeiro cartão (Opcional)' : '+ Adicionar Cartão'}
+          </button>
+          <div className={styles.tooltipContainer}>
+            <InfoIcon />
+            <span className={styles.tooltipText}>
+              Fique tranquilo! As informações são apenas para organização. Não pedimos dados sensíveis como número do cartão ou código de segurança.
+            </span>
+          </div>
+        </div>
       </div>
       
       {error && <p className={styles.error}>{error}</p>} 
