@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { signInWithEmailAndPassword, signInWithPopup, signOut } from 'firebase/auth';
+import { signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
 import { auth, provider } from '../../lib/firebase';
 import { useAuth } from '../../lib/AuthContext';
 import styles from '../../styles/Auth.module.css';
@@ -30,14 +30,7 @@ export default function LoginPage() {
     setError(null);
 
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      
-      if (!userCredential.user.emailVerified) {
-        await signOut(auth); 
-        setError('Seu e-mail ainda não foi verificado. Por favor, cheque sua caixa de entrada e clique no link de confirmação.');
-        return;
-      }
-
+      await signInWithEmailAndPassword(auth, email, password);
     } catch (error) {
       setError('Falha ao entrar. Verifique seu e-mail e senha.');
       console.error('Login error: ', error);
