@@ -1,99 +1,48 @@
 
-# Blueprint: FinanceApp
+# Blueprint do Projeto: MoneyForge
+
+Este documento serve como uma fonte central de verdade para o projeto MoneyForge, detalhando sua arquitetura, funcionalidades e o plano de desenvolvimento.
 
 ## Visão Geral
 
-O FinanceApp é uma aplicação web completa para gerenciamento de finanças pessoais. Ele permite que os usuários cadastrem-se, façam login, e gerenciem suas transações (receitas e despesas), definam metas financeiras, acompanhem orçamentos mensais e monitorem o desempenho de plataformas de investimento. A aplicação possui um design moderno, responsivo e intuitivo, com gráficos interativos que facilitam a visualização da saúde financeira do usuário.
+O MoneyForge é uma plataforma completa para ajudar os usuários a organizar suas despesas, planejar orçamentos e alcançar seus objetivos financeiros. A aplicação oferece ferramentas para rastreamento de transações, criação de orçamentos, monitoramento de investimentos e muito mais.
 
 ## Esboço do Projeto
 
+Esta seção documenta o estado atual da aplicação, incluindo estilo, design e funcionalidades implementadas.
+
 ### Estilo e Design
 
-O FinanceApp adota um design **dark theme (tema escuro)**, moderno e sofisticado, focado em criar uma experiência de usuário imersiva e visualmente agradável.
-
-- **Paleta de Cores:**
-  - **Fundo Principal:** Cinza escuro (`#121212`).
-  - **Cards e Cabeçalho:** Grafite (`#1C1C22`).
-  - **Barra Lateral:** Verde-azulado escuro e suave (`#1A3A3A`).
-  - **Cores de Destaque:**
-    - **Renda:** Verde vibrante (`#10B981`).
-    - **Despesa:** Vermelho vibrante (`#EF4444`).
-    - **Saldo:** Azul (`#0070F3`).
-- **Tipografia:** Fonte limpa e moderna (`Inter`), com uma hierarquia clara para garantir a legibilidade.
-- **Layout:** Responsivo, com uma barra de navegação lateral e uma área de conteúdo principal.
-- **Ícones:** Uso de `react-icons` para uma navegação intuitiva.
-- **Gráficos:** Utilização da biblioteca `react-chartjs-2` para criar gráficos de linha e de barras interativos.
+*   **Identidade Visual:**
+    *   **Nome:** A aplicação se chama **MoneyForge**.
+    *   **Logo:** A aplicação utiliza um logo em formato PNG para garantir alta qualidade visual. O arquivo de logo oficial é o `public/imagem_1.png`.
+    *   **Favicon:** O ícone da aba do navegador é o `public/icon_2.ico`.
+    *   **Slogan:** "Forjando dinheiro, construindo riqueza" é o slogan oficial, exibido abaixo do nome da aplicação para reforçar a proposta de valor.
+*   **Estilo Global:** O arquivo `styles/globals.css` define os estilos base para toda a aplicação.
+*   **Layout da Aplicação:**
+    *   **Cabeçalhos:**
+        *   O estilo do cabeçalho, definido em `styles/Header.module.css`, foi ajustado para garantir que o logo fique perfeitamente alinhado à esquerda da página.
+        *   Foram criadas classes CSS específicas (`.logoContainer`, `.logoTextContainer`, `.appName`, `.slogan`) para estruturar o logo, o nome e o slogan, garantindo uma apresentação visualmente agradável e hierárquical.
+    *   **Página de Destino (Landing Page):**
+        *   Utiliza um layout limpo e moderno, definido em `styles/Home.module.css`.
+        *   Possui um cabeçalho simplificado (`components/layout/LandingHeader.tsx`) com o logo, o nome da aplicação e o slogan.
+        *   Apresenta um título de herói, uma breve descrição e um botão de chamada para ação ("Comece Agora") que direciona para a página de autenticação.
+    *   **Layout Principal (Pós-Login):**
+        *   Utiliza um layout de painel com uma barra lateral e uma área de conteúdo principal, definido em `styles/Layout.module.css`.
+        *   Inclui um cabeçalho de navegação completo (`components/layout/Header.tsx`) com o logo, o nome da aplicação, o slogan, links para "Dashboard", "Investimentos", "Orçamentos" e um botão "Sair".
+        *   A barra lateral (`components/layout/Sidebar.tsx`) oferece navegação adicional e acesso a funcionalidades como adicionar transações.
 
 ### Funcionalidades Implementadas
 
-- **Autenticação e Perfil de Usuário:**
-  - Registro, login e logout seguros.
-  - Exibição da foto e do e-mail do usuário na barra lateral.
-- **Dashboard:**
-  - Cabeçalho com resumo financeiro (saldo, receitas, despesas) e botões de ação.
-  - Gráficos de comparação e evolução do patrimônio.
-- **Transações:**
-  - Listagem e adição de novas transações através de um formulário modal.
-- **Calendário de Gastos:**
-  - Visualização de um calendário anual com os dias de despesa destacados.
-- **Orçamento:**
-  - Definição de limites de gasto mensais por categoria.
-- **Investimentos:**
-  - Listagem e acompanhamento de plataformas de investimento.
-- **Metas Financeiras:**
-  - Cadastro, acompanhamento e adição de fundos a metas financeiras.
-- **Transações Recorrentes:**
-  - Agendamento de transações recorrentes.
-- **Gerenciamento de Cartões de Crédito:**
-  - Seção "Meus Cartões" para adicionar, visualizar e excluir cartões.
-  - A lógica de parcelamento agora utiliza a data de vencimento do cartão para calcular os lançamentos futuros.
-
-### Estrutura de Rotas
-
-O projeto utiliza *Route Groups* do Next.js para uma organização lógica: `app/(main)` para páginas principais e `app/login` para a autenticação.
-
-## Atualização do Modal de Transações (Sessão Atual)
-
-Nesta sessão, o foco foi aprimorar o modal de cadastro de transações, adicionando um sistema de categorização mais robusto e detalhado para receitas e despesas.
-
-1.  **Problema:** O formulário de transações era simples e não permitia uma classificação detalhada, dificultando a análise financeira posterior.
-
-2.  **Solução Implementada:**
-    *   **Estrutura de Categorias:** Foi implementada uma nova estrutura de "Grupo" e "Sub-grupo" com base na especificação detalhada fornecida pelo usuário. Essa estrutura abrange diversas fontes de receita e naturezas de despesa (essenciais, supérfluos, por meio de pagamento, etc.).
-    *   **Novo Componente de Formulário (`TransactionForm.tsx`):** Para manter a organização do código, foi criado um componente React dedicado exclusivamente ao formulário de adição de transações.
-        *   Este formulário inclui campos para descrição, valor, tipo (receita/despesa) e os novos seletores de "Grupo" and "Sub-grupo".
-    *   **Integração com o Modal (`TransactionModal.tsx`):**
-        *   O modal existente foi modificado para incluir um botão "Adicionar Transação".
-        *   Ao clicar neste botão, o novo `TransactionForm` é exibido ou ocultado dentro do próprio modal, sem alterar o layout principal da página.
-    *   **Dropdowns Dinâmicos:** O seletor de "Sub-grupo" é populado dinamicamente com as opções correspondentes ao "Grupo" selecionado, garantindo uma experiência de usuário fluida e evitando combinações inválidas.
-    *   **Estilização:** Foram criados e aplicados estilos (`TransactionForm.module.css` e ajustes em `TransactionModal.module.css`) para garantir que o novo formulário e o botão de ação estejam visualmente alinhados com o design *dark theme* da aplicação.
-
-3.  **Estado Atual:**
-    *   A interface do modal foi completamente atualizada conforme solicitado.
-    *   A lógica de submissão do formulário, por enquanto, apenas exibe os dados no console do navegador. O próximo passo será conectar este formulário ao serviço do Firestore para salvar as novas transações no banco de dados.
-
-## Histórico de Correções (Sessão Recente)
-
-Esta seção documenta a resolução de um bug crítico relacionado à funcionalidade "Meus Cartões".
-
-1.  **Problema Inicial:** Ao adicionar um novo cartão, ele ficava visualmente "travado" em um estado desabilitado (cinza claro), sem ser salvo no banco de dados. O front-end tentava salvar, mas a operação nunca era concluída.
-
-2.  **Diagnóstico e Depuração:** A investigação revelou uma cascata de problemas de configuração com o Firebase, que impediam qualquer escrita no banco de dados Firestore.
-    - **Causa Raiz 1: Falta de Configuração do Firebase.** O projeto não estava inicializado como um projeto Firebase, faltando o arquivo `firebase.json` e as configurações associadas.
-    - **Causa Raiz 2: Falta de Autenticação.** O ambiente de desenvolvimento não estava autenticado na conta Firebase do usuário.
-    - **Causa Raiz 3: Nenhuma Regra de Segurança.** Mesmo que a autenticação funcionasse, não existiam regras de segurança (`firestore.rules`) para autorizar a escrita de dados.
-
-3.  **Processo de Resolução:**
-    - **Passo 1: Autenticação:** Guiado pelo usuário, o ambiente foi autenticado com sucesso na conta Firebase correta via fluxo OAuth2.
-    - **Passo 2: Seleção do Projeto:** O projeto `projeto-financeiro-2026` foi selecionado e configurado como o projeto ativo.
-    - **Passo 3: Inicialização do Firebase:** O comando `firebase init` foi executado para criar o `firebase.json` e configurar o projeto localmente.
-    - **Passo 4: Primeira Tentativa de Regra:** Uma regra de segurança inicial foi criada e implantada. Isso levou a um novo erro.
-
-4.  **Problema Secundário:** Após a configuração inicial, o erro evoluiu. Em vez de travar, o aplicativo exibia a mensagem: "Ocorreu um erro ao salvar o cartão. A alteração foi desfeita."
-
-5.  **Diagnóstico e Solução Final:**
-    - **Causa Raiz:** A regra de segurança era muito restritiva. Ela só permitia a escrita se o usuário já fosse o "dono" do documento (`resource.data.uid`), o que é impossível para um documento que ainda não foi criado.
-    - **Correção:** A regra foi refinada para tratar a criação (`create`) e a modificação (`update`, `delete`) de forma separada.
-        - `allow create`: Se o ID do usuário na **nova** requisição (`request.resource.data.uid`) for igual ao ID do usuário autenticado.
-        - `allow read, update, delete`: Se o ID do usuário no documento **existente** (`resource.data.uid`) for igual ao ID do usuário autenticado.
-    - **Implantação Final:** A regra corrigida foi implantada com sucesso, resolvendo completamente o bug. A funcionalidade de adicionar cartões agora opera conforme o esperado.
+*   **Autenticação de Usuário:**
+    *   Sistema de login/logout funcional usando o Firebase Authentication.
+    *   O contexto de autenticação (`lib/AuthContext.js`) gerencia o estado do usuário em toda a aplicação.
+    *   A página de autenticação (`/auth`) serve tanto para login de usuários existentes quanto para a criação de novas contas.
+*   **Roteamento e Layouts:**
+    *   Uso do App Router do Next.js.
+    *   Layouts separados para a página de destino (pública) e a aplicação principal (privada, para usuários autenticados).
+    *   A página de destino é a rota raiz (`/`).
+    *   A área principal da aplicação está agrupada sob a rota `/(main)`.
+*   **API Backend:**
+    *   Rotas de API criadas para gerenciar orçamentos (`app/api/budget/route.ts`).
+    *   Utiliza o Firebase Admin SDK para operações de backend seguras.

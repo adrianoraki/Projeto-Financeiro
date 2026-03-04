@@ -1,0 +1,141 @@
+
+.container {
+  background-color: #ffffff; /* Fundo branco */
+  color: #2c3e50; /* Texto escuro (cinza azulado) */
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+/* Seção de Herói */
+.hero {
+  width: 100%;
+  padding: 3rem 2rem; /* Espaçamento superior reduzido */
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.heroContent {
+    max-width: 800px;
+}
+
+.title {
+  font-size: 3.5rem;
+  font-weight: 800;
+  line-height: 1.2;
+  margin-bottom: 1rem;
+  color: #34495e; /* Tom mais escuro para o título */
+}
+
+.appName {
+  color: #3498db; /* Azul vibrante, como na imagem */
+}
+
+.description {
+  font-size: 1.25rem;
+  color: #7f8c8d; /* Cinza mais suave para a descrição */
+  max-width: 600px;
+  margin: 0 auto 2.5rem auto;
+}
+
+.ctaButton {
+  background-color: #3498db;
+  color: #ffffff;
+  padding: 1rem 2.5rem;
+  border-radius: 25px;
+  border: none;
+  font-size: 1.1rem;
+  font-weight: bold;
+  text-decoration: none;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 4px 15px rgba(52, 152, 219, 0.4);
+}
+
+.ctaButton:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(52, 152, 219, 0.6);
+}
+
+/* Seção de Funcionalidades */
+.featuresSection {
+    padding: 4rem 2rem;
+    width: 100%;
+    max-width: 1200px;
+    text-align: center;
+}
+
+.featuresTitle {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 3rem;
+    color: #34495e;
+}
+
+.featuresGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+}
+
+.featureCard {
+  background-color: transparent; /* Sem fundo de card */
+  padding: 2rem;
+  border-radius: 15px;
+  transition: transform 0.3s ease;
+}
+
+.featureCard:hover {
+  transform: translateY(-5px);
+}
+
+.featureCard h3 {
+  font-size: 1.5rem;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+  color: #2c3e50;
+}
+
+.featureCard p {
+  color: #7f8c8d;
+  line-height: 1.6;
+}
+
+.icon {
+    color: #3498db;
+    margin-bottom: 1rem;
+}
+
+/* Rodapé */
+.footer {
+    width: 100%;
+    padding: 2rem;
+    text-align: center;
+    background-color: #f8f9fa;
+    border-top: 1px solid #e7e7e7;
+    margin-top: auto;
+}
+
+.footer p {
+    color: #7f8c8d;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .title {
+        font-size: 2.8rem;
+    }
+    .description {
+        font-size: 1.1rem;
+    }
+}

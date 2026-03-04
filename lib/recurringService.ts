@@ -8,13 +8,30 @@ import {
   getDocs,
   updateDoc,
   doc,
+  Timestamp,
 } from 'firebase/firestore';
-import { addTransaction } from './transactionService';
+import { addTransaction, TransactionFormInput } from './transactionService';
 
 const RECURRING_COLLECTION = 'recurringTransactions';
 
+// Interface para uma transação recorrente
+export interface RecurringTransaction {
+  id: string;
+  uid: string;
+  description: string;
+  amount: number;
+  type: 'income' | 'expense';
+  category: string; // This is the old field, used for fallback
+  frequency: 'Diária' | 'Semanal' | 'Mensal';
+  lastRun: Timestamp;
+  budgetId?: string; // This seems to be unused now by addTransaction
+}
+
+// Tipo para a entrada de uma nova transação recorrente
+type RecurringTransactionInput = Omit<RecurringTransaction, 'id' | 'lastRun'>;
+
 // Adicionar uma nova transação recorrente
-export const addRecurringTransaction = async (recurringTransaction: any) => {
+export const addRecurringTransaction = async (recurringTransaction: RecurringTransactionInput) => {
   try {
     await addDoc(collection(db, RECURRING_COLLECTION), { ...recurringTransaction, lastRun: new Date() });
   } catch (error) {
@@ -24,15 +41,14 @@ export const addRecurringTransaction = async (recurringTransaction: any) => {
 };
 
 // Buscar todas as transações recorrentes de um usuário
-export const getRecurringTransactions = async (uid: string) => {
+export const getRecurringTransactions = async (uid: string): Promise<RecurringTransaction[]> => {
   try {
     const q = query(collection(db, RECURRING_COLLECTION), where('uid', '==', uid));
     const querySnapshot = await getDocs(q);
-    const recurring: any[] = [];
-    querySnapshot.forEach((doc) => {
-      recurring.push({ id: doc.id, ...doc.data() });
-    });
-    return recurring;
+    return querySnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    } as RecurringTransaction));
   } catch (error) {
     console.error("Erro ao buscar transações recorrentes: ", error);
     return [];
@@ -55,7 +71,7 @@ export const processRecurringTransactions = async (uid: string) => {
   const now = new Date();
 
   for (const recurring of recurringTransactions) {
-    let nextRun = new Date(recurring.lastRun.seconds * 1000);
+    let nextRun = recurring.lastRun.toDate();
     let shouldRun = false;
 
     while (nextRun <= now) {
@@ -74,15 +90,17 @@ export const processRecurringTransactions = async (uid: string) => {
     }
 
     if (shouldRun) {
-      await addTransaction({
+      const transactionData: TransactionFormInput = {
         uid,
         description: recurring.description,
         amount: recurring.amount,
         type: recurring.type,
-        category: recurring.category, // Adicionando a categoria que faltava
+        group: recurring.category, // Use old category as group
+        subGroup: 'Recorrente',    // Add placeholder for subGroup
         date: new Date().toISOString().split('T')[0],
-        budgetId: recurring.budgetId,
-      });
+      };
+
+      await addTransaction(transactionData);
       await updateLastRun(recurring.id, new Date());
     }
   }

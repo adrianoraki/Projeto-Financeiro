@@ -1,133 +1,150 @@
 
 .container {
     padding: 2rem;
-    background-color: #f0f2f5;
+    background-color: #1a1d2e; /* Fundo escuro */
     min-height: 100vh;
-  }
-  
-  .header {
+    color: #E0E0E0; /* Texto claro */
+}
+
+.header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 2rem;
-  }
-  
-  .header h1 {
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.header h1 {
     font-size: 2rem;
-    color: #333;
-  }
+    color: #FFFFFF;
+    font-weight: 600;
+}
 
-  .headerActions {
-    display: flex;
-    align-items: center;
-  }
-  
-  .addButton {
-    background-color: #007bff;
-    color: white;
-    border: none;
-    padding: 0.8rem 1.5rem;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 1rem;
-    transition: background-color 0.3s ease;
-  }
-  
-  .addButton:hover {
-    background-color: #0056b3;
-  }
-  
-  .cardsGrid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 1.5rem;
-  }
-  
-  .card {
-    background: white;
-    border-radius: 8px;
-    padding: 1.5rem;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    transition: transform 0.2s;
-    position: relative;
-    border-left: 5px solid #007bff; /* Default border color */
-  }
-
-  .card.creditCard { border-left-color: #1a73e8; }
-  .card.pix { border-left-color: #34a853; }
-  .card.boleto { border-left-color: #ff5722; }
-  .card.debit { border-left-color: #9c27b0; }
-  
-  .card:hover {
-    transform: translateY(-5px);
-  }
-  
-  .cardHeader {
+.headerActions {
     display: flex;
     align-items: center;
     gap: 1rem;
-    margin-bottom: 1rem;
-  }
+}
 
-  .cardIcon {
+.addButton {
+    background-color: #0070F3;
+    color: white;
+    border: none;
+    padding: 0.8rem 1.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 500;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.addButton:hover {
+    background-color: #005bb5;
+    transform: translateY(-2px);
+}
+
+.cardsGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1.5rem;
+}
+
+.card {
+    background-color: #252a41; /* Cor de fundo do cartão */
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    position: relative;
+    border-left: 4px solid; /* Borda colorida */
+    overflow: hidden;
+}
+
+/* Cores da borda por tipo */
+.card.creditCard { border-left-color: #4A90E2; }
+.card.pix { border-left-color: #34D399; }
+.card.boleto { border-left-color: #F5A623; }
+.card.debit { border-left-color: #9013FE; }
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 24px rgba(0,0,0,0.25);
+}
+
+.cardHeader {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+}
+
+.cardIcon {
     font-size: 1.8rem;
-  }
+}
 
-  .creditCard .cardIcon { color: #1a73e8; }
-  .pix .cardIcon { color: #34a853; }
-  .boleto .cardIcon { color: #ff5722; }
-  .debit .cardIcon { color: #9c27b0; }
+/* Cores do ícone por tipo */
+.creditCard .cardIcon { color: #4A90E2; }
+.pix .cardIcon { color: #34D399; }
+.boleto .cardIcon { color: #F5A623; }
+.debit .cardIcon { color: #9013FE; }
 
-  .cardBody p {
-      margin: 0.3rem 0;
-      color: #555;
-  }
-
-  .card h3 {
+.card h3 {
     margin: 0;
     font-size: 1.25rem;
-  }
-  
-  .deleteButton {
+    color: #FFFFFF; /* Título do cartão em branco */
+}
+
+.cardBody p {
+    margin: 0.3rem 0;
+    color: #A0AEC0; /* Detalhes do cartão em cinza claro */
+}
+
+.deleteButton {
     position: absolute;
     top: 1rem;
     right: 1rem;
-    background: transparent;
+    background: none;
     border: none;
-    color: #888;
+    color: #8A91B4;
     cursor: pointer;
     font-size: 1.2rem;
-  }
+    transition: color 0.3s ease;
+}
 
-  .deleteButton:hover {
-      color: #dc3545;
-  }
-  
-  .error {
-      color: #dc3545;
-      background-color: #f8d7da;
-      border: 1px solid #f5c6cb;
-      padding: 1rem;
-      border-radius: 5px;
-      margin-bottom: 1rem;
-  }
+.deleteButton:hover {
+    color: #EF4444; /* Vermelho para deletar */
+}
 
-  /* Tooltip Styles */
-  .tooltipContainer {
+.error {
+    color: #F87171;
+    background-color: rgba(239, 68, 68, 0.1);
+    border: 1px solid #EF4444;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
+
+/* Tooltip */
+.tooltipContainer {
     position: relative;
     display: flex;
     align-items: center;
-    margin-left: 12px;
-  }
-  
-  .tooltipIcon {
+}
+
+.tooltipIcon {
     cursor: pointer;
-    width: 22px;
-    height: 22px;
-    color: #666;
-  }
-  
-  .tooltipText {
+    width: 24px;
+    height: 24px;
+    color: #8A91B4;
+    transition: color 0.3s ease;
+}
+
+.tooltipIcon:hover {
+    color: #FFFFFF;
+}
+
+.tooltipText {
     visibility: hidden;
     width: 240px;
     background-color: #333;
@@ -136,27 +153,38 @@
     border-radius: 6px;
     padding: 8px 12px;
     position: absolute;
-    z-index: 1;
-    bottom: 135%; 
+    z-index: 10;
+    bottom: 135%;
     left: 50%;
     margin-left: -120px;
     opacity: 0;
     transition: opacity 0.3s ease;
     font-size: 0.85rem;
-  }
-  
-  .tooltipText::after {
-    content: "";
-    position: absolute;
-    top: 100%;
-    left: 50%;
-    margin-left: -5px;
-    border-width: 5px;
-    border-style: solid;
-    border-color: #333 transparent transparent transparent;
-  }
-  
-  .tooltipContainer:hover .tooltipText {
+}
+
+.tooltipContainer:hover .tooltipText {
     visibility: visible;
     opacity: 1;
-  }
+}
+
+/* Media Queries */
+@media (max-width: 768px) {
+    .header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .headerActions, .addButton {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .container {
+        padding: 1rem;
+    }
+
+    .cardsGrid {
+        grid-template-columns: 1fr;
+    }
+}

@@ -1,7 +1,12 @@
 
 import React from 'react';
-import { AuthProvider } from '../lib/AuthContext';
+import { Providers } from './providers';
 import '../styles/globals.css';
+
+export const metadata = {
+  title: 'MoneyForge - Controle suas Finanças',
+  description: 'A plataforma completa para organizar suas despesas, planejar orçamentos e alcançar seus objetivos financeiros.',
+};
 
 export default function RootLayout({
   children,
@@ -10,8 +15,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="pt-br">
+      <head>
+        <link rel="icon" href="/favicon_2.png" type="image/png" />
+      </head>
       <body>
-        <AuthProvider>{children}</AuthProvider>
+        <Providers> 
+          <main>{children}</main>
+        </Providers>
       </body>
     </html>
   );

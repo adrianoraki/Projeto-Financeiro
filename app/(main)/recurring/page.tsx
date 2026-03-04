@@ -1,37 +1,70 @@
-
 'use client';
 
-import { useState, useEffect } from 'react';
-import styles from '../../../styles/RecurringPage.module.css';
-import RecurringForm from '../../../components/RecurringForm';
-import { useAuth } from '../../../lib/AuthContext';
-import { addRecurringTransaction, getRecurringTransactions } from '../../../lib/recurringService';
-import { getBudgets } from '../../../lib/budgetService';
+import { useState, useEffect, useCallback } from 'react';
+import styles from '@/styles/RecurringPage.module.css';
+import RecurringForm from '@/components/recurring/RecurringForm';
+import type { RecurringTransactionData } from '@/components/recurring/RecurringForm';
+import { useAuth } from '@/lib/AuthContext';
+import type { Budget, RecurringTransaction } from '@/types'; // Corrigido: Importando do arquivo de tipos compartilhado
 
 const RecurringPage = () => {
   const { user } = useAuth();
-  const [recurringTransactions, setRecurringTransactions] = useState<any[]>([]);
-  const [budgets, setBudgets] = useState<any[]>([]);
+  const [recurringTransactions, setRecurringTransactions] = useState<RecurringTransaction[]>([]);
+  const [budgets, setBudgets] = useState<Budget[]>([]);
   const [showForm, setShowForm] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (user) {
-      const fetchData = async () => {
-        const recurring = await getRecurringTransactions(user.uid);
-        const budgetData = await getBudgets(user.uid);
-        setRecurringTransactions(recurring);
-        setBudgets(budgetData);
-      };
-      fetchData();
+  const fetchData = useCallback(async () => {
+    if (!user) return;
+    try {
+      const idToken = await user.getIdToken();
+      const headers = { 'Authorization': `Bearer ${idToken}` };
+
+      // Buscar transações recorrentes
+      const recurringRes = await fetch('/api/recurring', { headers });
+      if (!recurringRes.ok) throw new Error('Falha ao buscar transações recorrentes');
+      const recurringData = await recurringRes.json();
+      setRecurringTransactions(recurringData);
+
+      // Buscar orçamentos
+      const budgetRes = await fetch('/api/budget', { headers });
+      if (!budgetRes.ok) throw new Error('Falha ao buscar orçamentos');
+      const budgetData = await budgetRes.json();
+      setBudgets(budgetData);
+
+    } catch (err: any) {
+      setError(err.message);
+      console.error(err);
     }
   }, [user]);
 
-  const handleSaveRecurring = async (newRecurring: any) => {
-    if (user) {
-      await addRecurringTransaction({ ...newRecurring, uid: user.uid });
-      // Refetch to show the new item
-      const recurring = await getRecurringTransactions(user.uid);
-      setRecurringTransactions(recurring);
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  const handleSaveRecurring = async (formData: RecurringTransactionData) => {
+    if (!user) return;
+    try {
+      const idToken = await user.getIdToken();
+      const response = await fetch('/api/recurring', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${idToken}`,
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Falha ao salvar transação recorrente');
+      }
+
+      setShowForm(false);
+      fetchData(); // Re-fetch all data
+    } catch (err: any) {
+      setError(err.message);
+      console.error(err);
     }
   };
 
@@ -48,11 +81,13 @@ const RecurringPage = () => {
         </button>
       </header>
 
+      {error && <p className={styles.error}>{error}</p>}
+
       {showForm && (
         <RecurringForm
           onClose={() => setShowForm(false)}
           onSave={handleSaveRecurring}
-          budgets={budgets}
+          budgets={budgets} // Agora `budgets` tem o tipo correto
         />
       )}
 
@@ -65,7 +100,7 @@ const RecurringPage = () => {
               <li key={transaction.id} className={styles.listItem}>
                 <span>{transaction.description}</span>
                 <span className={transaction.type === 'income' ? styles.income : styles.expense}>
-                  R$ {transaction.amount.toFixed(2)}
+                  R$ {(transaction.amount / 100).toFixed(2).replace('.', ',')}
                 </span>
                 <span>{transaction.frequency}</span>
               </li>

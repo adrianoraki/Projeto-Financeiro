@@ -1,6 +1,6 @@
 
 .container {
-  padding: 0.5rem; /* Reduzido de 1rem para 0.5rem */
+  padding: 0.5rem;
   color: #E0E0E0;
 }
 
@@ -8,7 +8,9 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 0.5rem; /* Reduzido de 1rem para 0.5rem */
+  margin-bottom: 1.5rem; /* Aumentado para dar mais espaço */
+  flex-wrap: wrap; /* Permite que o botão quebre a linha em telas pequenas */
+  gap: 1rem; /* Espaço entre o título e o botão */
 }
 
 .header h1 {
@@ -40,4 +42,24 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 1.5rem;
+}
+
+/* --- Media Queries para Responsividade --- */
+
+/* Telas pequenas (celulares) */
+@media (max-width: 480px) {
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .addButton {
+    width: 100%; /* Ocupa toda a largura */
+    text-align: center;
+  }
+
+  .budgetGrid {
+    /* Força uma única coluna para os cards */
+    grid-template-columns: 1fr;
+  }
 }

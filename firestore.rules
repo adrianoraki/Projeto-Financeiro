@@ -1,12 +1,20 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /transactions/{transactionId} {
-      allow read, update, delete: if request.auth != null && resource.data.uid == request.auth.uid;
-      allow create: if request.auth != null;
+    // Helper function to check ownership
+    function isOwner(userId) {
+      return request.auth != null && request.auth.uid == userId;
     }
+
+    // Secure all user-specific collections
+    match /{collection}/{docId} where collection in ['transactions', 'cards', 'goals', 'budgets', 'recurring'] {
+      allow read, update, delete: if isOwner(resource.data.uid);
+      allow create: if isOwner(request.resource.data.uid);
+    }
+
+    // Users can only access their own user document
     match /users/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
+      allow read, create, update, delete: if isOwner(userId);
     }
   }
 }

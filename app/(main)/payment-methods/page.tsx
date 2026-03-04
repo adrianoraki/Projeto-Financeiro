@@ -11,9 +11,9 @@ import {
   PaymentMethodDetails,
   PaymentMethod
 } from '../../../lib/paymentMethodService';
-import PaymentMethodForm from '../../../components/PaymentMethodForm';
+import PaymentMethodForm from '../../../components/payment/PaymentMethodForm';
 import styles from '../../../styles/CardsPage.module.css';
-import { FaTrash, FaCreditCard, FaMoneyBillWave, FaBarcode, FaUniversity } from 'react-icons/fa';
+import { FaTrash, FaCreditCard, FaMoneyBillWave, FaBarcode, FaUniversity, FaWallet } from 'react-icons/fa';
 
 const InfoIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={styles.tooltipIcon}>
@@ -90,18 +90,21 @@ const PaymentMethodsPage = () => {
 
   const renderPaymentMethodDetails = (method: PaymentMethodRecord) => {
     switch (method.type) {
-        case 'creditCard':
-            const details = method.details as any;
-            return <><p>Bandeira: {details.brand}</p><p>Vencimento: Dia {details.invoiceDueDate}</p></>;
-        case 'pix':
-        case 'debit':
-            const pixDebitDetails = method.details as any;
-            return <><p>Banco: {pixDebitDetails.bank}</p><p>Pagamento: {pixDebitDetails.paymentType === 'avista' ? 'À Vista' : 'Parcelado'}</p></>;
-        case 'boleto':
-            const boletoDetails = method.details as any;
-            return <p>Pagamento: {boletoDetails.paymentType === 'avista' ? 'À Vista' : 'Parcelado'}</p>;
-        default:
-            return null;
+      case 'creditCard': {
+        const details = method.details as { brand: string; invoiceDueDate: number };
+        return <><p>Bandeira: {details.brand}</p><p>Vencimento: Dia {details.invoiceDueDate}</p></>;
+      }
+      case 'pix':
+      case 'debit': {
+        const pixDebitDetails = method.details as { bank: string; paymentType: string };
+        return <><p>Banco: {pixDebitDetails.bank}</p><p>Pagamento: {pixDebitDetails.paymentType === 'avista' ? 'À Vista' : 'Parcelado'}</p></>;
+      }
+      case 'boleto': {
+        const boletoDetails = method.details as { paymentType: string };
+        return <p>Pagamento: {boletoDetails.paymentType === 'avista' ? 'À Vista' : 'Parcelado'}</p>;
+      }
+      default:
+        return null;
     }
   }
 

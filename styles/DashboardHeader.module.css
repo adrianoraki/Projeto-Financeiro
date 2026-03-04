@@ -1,83 +1,65 @@
 
-.headerContainer {
-    background-color: #1C1C22;
-    padding: 1.5rem;
-    border-radius: 12px;
-    margin-bottom: 2rem;
-    box-shadow: 0 8px 30px rgba(0,0,0,0.5);
-  }
-  
-  .summaryCards {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1.5rem;
-    margin-bottom: 1.5rem;
-  }
-  
-  .card {
-    background-color: #2A2A33;
-    padding: 1.2rem;
-    border-radius: 10px;
-    border-left: 5px solid #0070F3;
-  }
-  
-  .card h4 {
-    margin: 0 0 0.5rem 0;
-    font-size: 1rem;
-    color: #A0A0A0;
-    font-weight: 500;
-  }
-  
-  .card p {
-    margin: 0;
-    font-size: 1.75rem;
-    font-weight: 600;
-  }
-  
-  .income {
-    color: #10B981;
-  }
-  
-  .expense {
-    color: #EF4444;
-  }
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  background-color: #1a202c; /* Um fundo escuro para o cabeçalho */
+  border-bottom: 1px solid #2d3748;
+}
 
-  .balance {
-    color: #0070F3;
-  }
-  
-  .actions {
-    display: flex;
-    gap: 1rem;
-  }
-  
-  .button {
-    border: none;
-    padding: 0.8rem 1.5rem;
-    border-radius: 8px;
-    font-size: 1rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s ease;
-  }
-  
-  .incomeButton {
-    background-color: #10B981;
-    color: white;
-  }
+.logoContainer {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem; /* Espaço entre a imagem e o texto */
+}
 
-  .incomeButton:hover {
-    background-color: #0e9f71;
-    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.2);
-  }
-  
-  .expenseButton {
-    background-color: #EF4444;
-    color: white;
-  }
+.logoTextContainer {
+  display: flex;
+  flex-direction: column;
+}
 
-  .expenseButton:hover {
-    background-color: #d93a3a;
-    box-shadow: 0 4px 15px rgba(239, 68, 68, 0.2);
-  }
-  
+.logo {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #ffffff;
+  margin: 0;
+}
+
+.tagline {
+  font-size: 0.8rem;
+  color: #a0aec0;
+  margin: 0;
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.navLink {
+  color: #cbd5e0;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s ease-in-out;
+}
+
+.navLink:hover {
+  color: #ffffff;
+}
+
+.logoutButton {
+  background-color: #e53e3e;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.logoutButton:hover {
+  background-color: #c53030;
+}

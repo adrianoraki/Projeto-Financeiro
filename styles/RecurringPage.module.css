@@ -2,6 +2,7 @@
 .container {
   padding: 2rem;
   color: #E0E0E0;
+  min-height: 100vh;
 }
 
 .header {
@@ -9,6 +10,8 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 2rem;
+  flex-wrap: wrap; /* Permite quebra de linha */
+  gap: 1rem; /* Espaçamento entre itens */
 }
 
 .header h1 {
@@ -33,9 +36,10 @@
 }
 
 .listContainer {
-  background-color: #1C1C22;
+  background-color: #252a41; /* Cor mais alinhada com o form */
   padding: 1.5rem;
   border-radius: 12px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
 }
 
 .list {
@@ -47,7 +51,8 @@
   justify-content: space-between;
   align-items: center;
   padding: 1rem 0;
-  border-bottom: 1px solid #333;
+  border-bottom: 1px solid #363b52;
+  gap: 1rem; /* Espaçamento entre os spans */
 }
 
 .listItem:last-child {
@@ -56,6 +61,13 @@
 
 .listItem span {
   font-size: 1rem;
+  flex-shrink: 0; /* Evita que o texto encolha */
+}
+
+.listItem span:first-child { /* Descrição */
+  flex-grow: 1; /* Permite que a descrição cresça */
+  flex-shrink: 1; /* Permite que a descrição encolha se necessário */
+  min-width: 100px; /* Largura mínima para a descrição */
 }
 
 .income {
@@ -66,4 +78,56 @@
 .expense {
   color: #EF4444;
   font-weight: 600;
+}
+
+/* --- Media Queries --- */
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.5rem;
+  }
+  .addButton {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+@media (max-width: 600px) {
+  .container {
+    padding: 1rem;
+  }
+
+  .listContainer {
+    padding: 1rem;
+  }
+
+  .listItem {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .listItem span {
+    padding: 0.2rem 0;
+  }
+
+  /* Adiciona pseudo-elementos para dar contexto no layout de coluna */
+  .listItem .income::before {
+    content: 'Valor: ';
+    font-weight: normal;
+    color: #A0AEC0;
+  }
+
+  .listItem .expense::before {
+    content: 'Valor: ';
+    font-weight: normal;
+    color: #A0AEC0;
+  }
+
+  .listItem span:nth-child(3)::before {
+    content: 'Frequência: ';
+    font-weight: normal;
+    color: #A0AEC0;
+  }
 }

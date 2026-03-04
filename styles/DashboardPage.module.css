@@ -1,31 +1,70 @@
+/* styles/DashboardPage.module.css */
 
 .container {
-    padding: 0.5rem; /* Reduzido de 1rem para 0.5rem */
+    padding: 0; /* Remove padding para um visual mais limpo */
     background-color: #121212;
     color: #E0E0E0;
-  }
-  
-  .chartsGrid {
+}
+
+.mainGrid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-    gap: 2rem;
-    margin-top: 0.5rem; /* Reduzido de 1rem para 0.5rem */
-  }
-  
-  .chartContainer {
+    gap: 1.5rem;
+    padding: 1.5rem; /* Adiciona padding ao redor do grid */
+
+    /* Define a estrutura do grid com áreas nomeadas */
+    grid-template-columns: repeat(3, 1fr); /* Três colunas de largura igual */
+    grid-template-areas:
+        "balance        income-expense  pie"
+        "goals          cdi             investments";
+}
+
+/* Áreas do Grid */
+.balanceArea { grid-area: balance; }
+.incomeExpenseArea { grid-area: income-expense; }
+.pieArea { grid-area: pie; }
+.goalsArea { grid-area: goals; }
+.cdiArea { grid-area: cdi; }
+.investmentsArea { grid-area: investments; }
+
+/* Estilo unificado para todos os cards e seções do grid */
+.gridSection {
     background-color: #1C1C22;
     padding: 1.5rem;
     border-radius: 12px;
-    box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
     display: flex;
     flex-direction: column;
-    height: 400px; /* Fixed height for consistency */
-  }
-  
-  .chartContainer h3 {
-    margin-top: 0;
-    margin-bottom: 1.5rem;
-    text-align: center;
-    font-size: 1.25rem;
-    font-weight: 600;
-  }
+    min-height: 350px; /* Garante uma altura mínima para todos */
+}
+
+/* --- Media Queries para Responsividade --- */
+
+/* Para tablets e telas médias */
+@media (max-width: 1200px) {
+    .mainGrid {
+        grid-template-columns: repeat(2, 1fr); /* Duas colunas */
+        grid-template-areas:
+            "balance        income-expense"
+            "pie            goals"
+            "cdi            investments";
+    }
+}
+
+/* Para celulares */
+@media (max-width: 768px) {
+    .mainGrid {
+        grid-template-columns: 1fr; /* Uma única coluna */
+        grid-template-areas:
+            "balance"
+            "income-expense"
+            "pie"
+            "goals"
+            "cdi"
+            "investments";
+        padding: 1rem 0;
+    }
+
+    .gridSection {
+        border-radius: 0; /* Remove bordas para visual full-width */
+    }
+}

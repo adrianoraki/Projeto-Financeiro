@@ -3,9 +3,9 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../../lib/AuthContext';
-import { getGoals, addGoal, Goal } from '../../../lib/goalsService';
-import GoalCard from '../../../components/GoalCard';
-import GoalForm from '../../../components/GoalForm';
+import { getGoalsByOwner, addGoal, Goal } from '../../../lib/goalsService';
+import GoalCard from '../../../components/goal/GoalCard';
+import GoalForm from '../../../components/goal/GoalForm';
 import styles from '../../../styles/GoalsPage.module.css';
 
 const GoalsPage = () => {
@@ -15,7 +15,7 @@ const GoalsPage = () => {
 
   const fetchGoals = async () => {
     if (user) {
-      const userGoals = await getGoals(user.uid);
+      const userGoals = await getGoalsByOwner(user.uid);
       setGoals(userGoals);
     }
   };

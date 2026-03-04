@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import { auth } from '../../lib/firebase';
@@ -31,7 +31,7 @@ export default function RegisterPage() {
 
   useEffect(() => {
     if (user) {
-      router.push('/dashboard');
+      router.push('/');
     } else {
       setLoading(false);
     }
@@ -53,6 +53,7 @@ export default function RegisterPage() {
         displayName: fullName,
       });
 
+      // Se o usuário decidiu adicionar um cartão, fazemos a chamada para a API
       if (showCardFields && cardName && cardBrand && cardDueDate) {
         const idToken = await userCredential.user.getIdToken();
         const response = await fetch('/api/cards', {
@@ -62,22 +63,25 @@ export default function RegisterPage() {
             'Authorization': `Bearer ${idToken}`,
           },
           body: JSON.stringify({ 
-            cardName, 
-            cardBrand, 
-            cardDueDate: parseInt(cardDueDate, 10)
+            name: cardName, 
+            brand: cardBrand, 
+            closingDay: parseInt(cardDueDate, 10),
+            dueDay: parseInt(cardDueDate, 10) + 7 // Exemplo, adicione a lógica correta
           }),
         });
 
         if (!response.ok) {
           const errorData = await response.json();
+          // Mesmo com erro no cartão, o usuário foi criado. Informamos e redirecionamos.
           setError(`Usuário criado, mas falha ao salvar cartão: ${errorData.error}`);
-          setTimeout(() => router.push('/dashboard'), 3000);
+          setTimeout(() => router.push('/'), 3000);
           return;
         }
       }
       
-      router.push('/dashboard');
-    } catch (error: any) {
+      router.push('/'); // Redireciona para o dashboard
+    } catch (err: unknown) {
+      const error = err as { code?: string };
       if (error.code === 'auth/email-already-in-use') {
         setError('Este e-mail já está em uso. Tente fazer login.');
       } else {
@@ -87,22 +91,27 @@ export default function RegisterPage() {
     }
   };
 
-  if (loading) {
-    return null;
+  if (loading || user) {
+    return <div className={styles.loading}>Carregando...</div>;
   }
 
   return (
     <div className={styles.container}>
       <div className={styles.backgroundImage} />
       <div className={styles.formContainer}>
-        <h1>Criar Conta</h1>
-        <form onSubmit={handleRegister}>
+        <h1 className={styles.title}>Crie sua conta</h1>
+        <p className={styles.subtitle}>Comece a organizar suas finanças hoje mesmo.</p>
+
+        {error && <p className={styles.error}>{error}</p>}
+
+        <form onSubmit={handleRegister} className={styles.form}>
           <input
             type="text"
             placeholder="Nome Completo"
             value={fullName}
             onChange={(e) => setFullName(e.target.value)}
             required
+            className={styles.input}
           />
           <input
             type="email"
@@ -110,6 +119,7 @@ export default function RegisterPage() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
+            className={styles.input}
           />
           <input
             type="password"
@@ -117,6 +127,7 @@ export default function RegisterPage() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
+            className={styles.input}
           />
           <input
             type="password"
@@ -124,6 +135,7 @@ export default function RegisterPage() {
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             required
+            className={styles.input}
           />
 
           <div className={styles.optionalActionContainer}>
@@ -132,7 +144,7 @@ export default function RegisterPage() {
               className={styles.toggleCardButton}
               onClick={() => setShowCardFields(!showCardFields)}
             >
-              {showCardFields ? 'Cancelar Cartão' : '+ Adicionar Cartão (Opcional)'}
+              {showCardFields ? 'Cancelar Cartão' : '+ Adicionar Cartão de Crédito (Opcional)'}
             </button>
             <div className={styles.tooltipContainer}>
                 <InfoIcon />
@@ -144,13 +156,14 @@ export default function RegisterPage() {
 
           {showCardFields && (
             <div className={styles.cardFields}>
-               <h3>Detalhes do Cartão (Opcional)</h3>
+               <h3 className={styles.cardFieldsTitle}>Detalhes do Cartão</h3>
               <input
                 type="text"
-                placeholder="Nome no Cartão"
+                placeholder="Apelido do Cartão (Ex: Nubank, Inter)"
                 value={cardName}
                 onChange={(e) => setCardName(e.target.value)}
                 required={showCardFields}
+                 className={styles.input}
               />
               <input
                 type="text"
@@ -158,24 +171,25 @@ export default function RegisterPage() {
                 value={cardBrand}
                 onChange={(e) => setCardBrand(e.target.value)}
                 required={showCardFields}
+                 className={styles.input}
               />
               <input
                 type="number"
-                placeholder="Dia de Vencimento da Fatura"
+                placeholder="Dia de Fechamento da Fatura"
                 value={cardDueDate}
                 onChange={(e) => setCardDueDate(e.target.value)}
                 required={showCardFields}
+                 className={styles.input}
               />
             </div>
           )}
 
-          <button type="submit">Registrar</button>
-          {error && <p className={styles.error}>{error}</p>}
+          <button type="submit" className={`${styles.button} ${styles.submitButton}`}>Registrar</button>
         </form>
 
-        <p>
+        <p className={styles.footerText}>
           Já tem uma conta?{' '}
-          <Link href="/login">
+          <Link href="/login" className={styles.link}>
             Faça login aqui
           </Link>
         </p>

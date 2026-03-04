@@ -1,24 +1,56 @@
 
 .container {
-  width: 100%;
+  padding: 0.5rem;
+  color: #E0E0E0; /* Cor de texto clara para fundo escuro */
 }
 
 .header {
-  margin-bottom: 0.5rem; /* Reduzido de 1rem para 0.5rem */
+  margin-bottom: 2rem; /* Mais espaço para o cabeçalho */
+  text-align: center; /* Centraliza o texto do cabeçalho */
 }
 
 .header h1 {
-  font-size: 2rem;
-  color: #333;
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #FFFFFF;
+  margin-bottom: 0.5rem;
 }
 
 .header p {
-  font-size: 1rem;
-  color: #666;
+  font-size: 1.1rem;
+  color: #B0B0B0; /* Cinza claro para o subtítulo */
+  max-width: 600px;
+  margin: 0 auto; /* Centraliza o parágrafo */
 }
 
 .investmentsGrid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
   gap: 1.5rem;
+}
+
+/* --- Media Queries para Responsividade --- */
+
+@media (max-width: 768px) {
+  .header h1 {
+    font-size: 2rem;
+  }
+  .header p {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 0;
+  }
+
+  .header {
+    padding: 1rem;
+  }
+  
+  .investmentsGrid {
+    grid-template-columns: 1fr; /* Layout de coluna única */
+    gap: 1rem;
+  }
 }

@@ -1,7 +1,7 @@
 
 import { db } from './firebase';
 import {
-  collection, addDoc, getDocs, deleteDoc, doc, query, where, serverTimestamp
+  collection, addDoc, getDocs, deleteDoc, doc, query, where, serverTimestamp, FieldValue
 } from 'firebase/firestore';
 
 // --- Base Interface ---
@@ -10,7 +10,7 @@ export interface PaymentMethod {
     uid: string;
     name: string; // Ex: "Nubank", "Banco do Brasil", "Boleto Genérico"
     type: 'creditCard' | 'pix' | 'boleto' | 'debit';
-    createdAt: any;
+    createdAt: Date | FieldValue;
 }
 
 // --- Specific Interfaces ---

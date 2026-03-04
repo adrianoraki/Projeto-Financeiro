@@ -1,48 +1,138 @@
 
-import { db } from './firebase';
-import { collection, addDoc, getDocs, query, where, doc, updateDoc, increment } from 'firebase/firestore';
+import { getDb } from '@/lib/firebase-admin'; // Caminho corrigido com alias
+import { FieldValue } from 'firebase-admin/firestore';
+import { z } from 'zod';
+import { toCents } from './currencyUtils';
 
-const budgetsCollection = collection(db, 'budgets');
+const BUDGETS_COLLECTION = 'budgets';
 
-// Add a new budget category for a user
-export const addBudget = async (userId: string, category: string, limit: number) => {
+const BudgetSchema = z.object({
+  uid: z.string().min(1, "UID do usuário é obrigatório."),
+  name: z.string().min(1, "O nome do orçamento é obrigatório.").max(50),
+  category: z.string().min(1, "A categoria é obrigatória.").max(50),
+  limit: z.number().positive("O limite deve ser um valor positivo."),
+});
+
+const UpdateBudgetSchema = z.object({
+  name: z.string().min(1, "O nome do orçamento é obrigatório.").max(50),
+  category: z.string().min(1, "A categoria é obrigatória.").max(50),
+  limit: z.number().positive("O limite deve ser um valor positivo."),
+});
+
+const UpdateSpentSchema = z.object({
+    budgetId: z.string().min(1, "ID do orçamento é obrigatório."),
+    transactionAmount: z.number().positive("O valor da transação deve ser positivo."),
+});
+
+type BudgetInput = z.infer<typeof BudgetSchema>;
+
+export interface Budget extends Omit<BudgetInput, 'limit'> {
+  id: string;
+  limit: number; 
+  spent: number; 
+}
+
+export const addBudget = async (budgetInput: BudgetInput) => {
+  const validation = BudgetSchema.safeParse(budgetInput);
+  if (!validation.success) {
+    throw new Error(`Dados do orçamento inválidos: ${validation.error.flatten().fieldErrors}`);
+  }
+
+  const { limit, ...restData } = validation.data;
+
   try {
-    const docRef = await addDoc(budgetsCollection, {
-      userId,
-      category,
-      limit,
-      spent: 0, // Initially, no amount is spent
-      createdAt: new Date(),
+    const firestore = getDb();
+    const docRef = await firestore.collection(BUDGETS_COLLECTION).add({
+      ...restData,
+      limit: toCents(limit), 
+      spent: 0, 
+      createdAt: FieldValue.serverTimestamp(),
     });
     return docRef.id;
   } catch (error) {
-    console.error("Error adding budget: ", error);
-    throw new Error("Could not add budget.");
+    console.error("Erro ao adicionar orçamento: ", error);
+    throw new Error("Não foi possível adicionar o orçamento.");
   }
 };
 
-// Get all budget categories for a user
-export const getBudgets = async (userId: string) => {
+export const getBudgetsByOwner = async (uid: string): Promise<Budget[]> => {
+  if (!uid) throw new Error("UID do usuário é obrigatório.");
+
   try {
-    const q = query(budgetsCollection, where("userId", "==", userId));
-    const querySnapshot = await getDocs(q);
-    const budgets = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    return budgets;
+    const firestore = getDb();
+    const q = firestore.collection(BUDGETS_COLLECTION).where("uid", "==", uid);
+    const querySnapshot = await q.get();
+    return querySnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...(doc.data() as Omit<Budget, 'id'>)
+    }));
   } catch (error) {
-    console.error("Error getting budgets: ", error);
-    throw new Error("Could not retrieve budgets.");
+    console.error("Erro ao buscar orçamentos: ", error);
+    throw new Error("Não foi possível buscar os orçamentos.");
   }
 };
 
-// Update the spent amount for a budget category
-export const updateBudgetSpent = async (budgetId: string, amount: number) => {
+export const updateBudget = async (budgetId: string, uid: string, budgetUpdate: { name: string, category: string, limit: number }) => {
+  const validation = UpdateBudgetSchema.safeParse(budgetUpdate);
+  if (!validation.success) {
+    throw new Error(`Dados do orçamento inválidos: ${validation.error.flatten().fieldErrors}`);
+  }
+
+  const firestore = getDb();
+  const budgetRef = firestore.collection(BUDGETS_COLLECTION).doc(budgetId);
   try {
-    const budgetDoc = doc(db, 'budgets', budgetId);
-    await updateDoc(budgetDoc, {
-      spent: increment(amount)
+    const budgetDoc = await budgetRef.get();
+    if (!budgetDoc.exists || budgetDoc.data()?.uid !== uid) {
+      throw new Error("Orçamento não encontrado ou você não tem permissão para atualizá-lo.");
+    }
+
+    const { limit, ...restData } = validation.data;
+
+    await budgetRef.update({
+      ...restData,
+      limit: toCents(limit),
     });
   } catch (error) {
-    console.error("Error updating budget spent amount: ", error);
-    throw new Error("Could not update budget.");
+    console.error("Erro ao atualizar orçamento: ", error);
+    throw new Error("Não foi possível atualizar o orçamento.");
   }
+
 }
+
+export const deleteBudgetForOwner = async (budgetId: string, uid: string) => {
+  if (!budgetId || !uid) throw new Error("ID do orçamento e UID do usuário são obrigatórios.");
+
+  const firestore = getDb();
+  const budgetRef = firestore.collection(BUDGETS_COLLECTION).doc(budgetId);
+  try {
+    const budgetDoc = await budgetRef.get();
+    if (!budgetDoc.exists || budgetDoc.data()?.uid !== uid) {
+      throw new Error("Orçamento não encontrado ou você não tem permissão para deletá-lo.");
+    }
+
+    await budgetRef.delete();
+  } catch (error) {
+    console.error("Erro ao deletar orçamento: ", error);
+    throw new Error("Não foi possível deletar o orçamento.");
+  }
+};
+
+export const updateBudgetSpent = async (budgetId: string, transactionAmount: number) => {
+    const validation = UpdateSpentSchema.safeParse({ budgetId, transactionAmount });
+    if (!validation.success) {
+        throw new Error(`Dados de atualização inválidos: ${validation.error.flatten().fieldErrors}`);
+    }
+
+    try {
+        const firestore = getDb();
+        const budgetRef = firestore.collection(BUDGETS_COLLECTION).doc(budgetId);
+        const amountInCents = toCents(transactionAmount);
+
+        await budgetRef.update({
+            spent: FieldValue.increment(amountInCents)
+        });
+    } catch (error) {
+        console.error("Erro ao atualizar o valor gasto do orçamento: ", error);
+        throw new Error("Não foi possível atualizar o orçamento.");
+    }
+};
