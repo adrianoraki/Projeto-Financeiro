@@ -1,115 +1,116 @@
+
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-import styles from '@/styles/RecurringPage.module.css';
-import RecurringForm from '@/components/recurring/RecurringForm';
-import type { RecurringTransactionData } from '@/components/recurring/RecurringForm';
-import { useAuth } from '@/lib/AuthContext';
-import type { Budget, RecurringTransaction } from '@/types'; // Corrigido: Importando do arquivo de tipos compartilhado
+import React, { useState, useEffect } from 'react';
+import { collection, addDoc, getDocs, deleteDoc, doc } from 'firebase/firestore';
+import { db } from '../../../lib/firebase';
+import { useAuth } from '../../../lib/AuthContext';
+import styles from '../../../styles/Recurring.module.css';
 
-const RecurringPage = () => {
+interface RecurringItem {
+  id: string;
+  name: string;
+  amount: number;
+  type: 'income' | 'expense';
+  dayOfMonth: number;
+}
+
+export default function RecurringPage() {
   const { user } = useAuth();
-  const [recurringTransactions, setRecurringTransactions] = useState<RecurringTransaction[]>([]);
-  const [budgets, setBudgets] = useState<Budget[]>([]);
-  const [showForm, setShowForm] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [recurringItems, setRecurringItems] = useState<RecurringItem[]>([]);
+  const [newItemName, setNewItemName] = useState('');
+  const [newItemAmount, setNewItemAmount] = useState('');
+  const [newItemType, setNewItemType] = useState<'income' | 'expense'>('expense');
+  const [newItemDay, setNewItemDay] = useState('');
 
-  const fetchData = useCallback(async () => {
-    if (!user) return;
-    try {
-      const idToken = await user.getIdToken();
-      const headers = { 'Authorization': `Bearer ${idToken}` };
-
-      // Buscar transações recorrentes
-      const recurringRes = await fetch('/api/recurring', { headers });
-      if (!recurringRes.ok) throw new Error('Falha ao buscar transações recorrentes');
-      const recurringData = await recurringRes.json();
-      setRecurringTransactions(recurringData);
-
-      // Buscar orçamentos
-      const budgetRes = await fetch('/api/budget', { headers });
-      if (!budgetRes.ok) throw new Error('Falha ao buscar orçamentos');
-      const budgetData = await budgetRes.json();
-      setBudgets(budgetData);
-
-    } catch (err: any) {
-      setError(err.message);
-      console.error(err);
-    }
-  }, [user]);
-
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
-
-  const handleSaveRecurring = async (formData: RecurringTransactionData) => {
-    if (!user) return;
-    try {
-      const idToken = await user.getIdToken();
-      const response = await fetch('/api/recurring', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${idToken}`,
-        },
-        body: JSON.stringify(formData),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Falha ao salvar transação recorrente');
+  const fetchRecurringItems = async () => {
+    if (user) {
+      try {
+        const querySnapshot = await getDocs(collection(db, `users/${user.uid}/recurring`));
+        const items: RecurringItem[] = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as RecurringItem));
+        setRecurringItems(items);
+      } catch (error) {
+        console.error("Error fetching recurring items: ", error);
       }
-
-      setShowForm(false);
-      fetchData(); // Re-fetch all data
-    } catch (err: any) {
-      setError(err.message);
-      console.error(err);
     }
   };
 
-  if (!user) {
-    return <p>Carregando...</p>;
-  }
+  useEffect(() => {
+    fetchRecurringItems();
+  }, [user]);
+
+  const addRecurringItem = async () => {
+    if (user && newItemName && newItemAmount && newItemDay) {
+      try {
+        await addDoc(collection(db, `users/${user.uid}/recurring`), {
+          name: newItemName,
+          amount: parseFloat(newItemAmount),
+          type: newItemType,
+          dayOfMonth: parseInt(newItemDay)
+        });
+        setNewItemName('');
+        setNewItemAmount('');
+        setNewItemType('expense');
+        setNewItemDay('');
+        fetchRecurringItems();
+      } catch (error) {
+        console.error("Error adding recurring item: ", error);
+      }
+    }
+  };
+
+  const deleteRecurringItem = async (id: string) => {
+    if (user) {
+      try {
+        await deleteDoc(doc(db, `users/${user.uid}/recurring`, id));
+        fetchRecurringItems();
+      } catch (error) {
+        console.error("Error deleting recurring item: ", error);
+      }
+    }
+  };
 
   return (
-    <div className={styles.container}>
-      <header className={styles.header}>
-        <h1>Transações Recorrentes</h1>
-        <button onClick={() => setShowForm(true)} className={styles.addButton}>
-          + Nova Recorrência
-        </button>
-      </header>
-
-      {error && <p className={styles.error}>{error}</p>}
-
-      {showForm && (
-        <RecurringForm
-          onClose={() => setShowForm(false)}
-          onSave={handleSaveRecurring}
-          budgets={budgets} // Agora `budgets` tem o tipo correto
+    <div className={styles.recurringContainer}>
+      <h1 className={styles.title}>Transações Recorrentes</h1>
+      
+      <div className={styles.inputForm}>
+        <input
+          type="text"
+          value={newItemName}
+          onChange={(e) => setNewItemName(e.target.value)}
+          placeholder="Nome da Transação"
         />
-      )}
-
-      <div className={styles.listContainer}>
-        {recurringTransactions.length === 0 ? (
-          <p>Você ainda não tem nenhuma transação recorrente cadastrada.</p>
-        ) : (
-          <ul className={styles.list}>
-            {recurringTransactions.map(transaction => (
-              <li key={transaction.id} className={styles.listItem}>
-                <span>{transaction.description}</span>
-                <span className={transaction.type === 'income' ? styles.income : styles.expense}>
-                  R$ {(transaction.amount / 100).toFixed(2).replace('.', ',')}
-                </span>
-                <span>{transaction.frequency}</span>
-              </li>
-            ))}
-          </ul>
-        )}
+        <input
+          type="number"
+          value={newItemAmount}
+          onChange={(e) => setNewItemAmount(e.target.value)}
+          placeholder="Valor"
+        />
+        <select value={newItemType} onChange={(e) => setNewItemType(e.target.value as 'income' | 'expense')}>
+          <option value="expense">Despesa</option>
+          <option value="income">Receita</option>
+        </select>
+        <input
+          type="number"
+          value={newItemDay}
+          onChange={(e) => setNewItemDay(e.target.value)}
+          placeholder="Dia do Mês"
+          min="1" 
+          max="31"
+        />
+        <button onClick={addRecurringItem}>Adicionar</button>
       </div>
+
+      <ul className={styles.recurringList}>
+        {recurringItems.map(item => (
+          <li key={item.id} className={`${styles.recurringItem} ${styles[item.type]}`}>
+            <span>{item.name} (Dia {item.dayOfMonth})</span>
+            <span>R$ {item.amount.toFixed(2)}</span>
+            <button onClick={() => deleteRecurringItem(item.id)}>Excluir</button>
+          </li>
+        ))}
+      </ul>
     </div>
   );
-};
-
-export default RecurringPage;
+}

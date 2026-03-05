@@ -12,9 +12,6 @@ import {
   GoogleAuthProvider,
   GithubAuthProvider,
   signInWithPopup,
-  AuthCredential,
-  EmailAuthProvider,
-  reauthenticateWithCredential,
   UserCredential // Importado para tipagem correta
 } from 'firebase/auth';
 import { auth, storage } from './firebase';

@@ -1,52 +1,50 @@
 
-import React from 'react'; // ADICIONADO PARA CORRIGIR O ERRO DE COMPILAÇÃO
+'use client';
+
+import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useAuth } from "../../lib/AuthContext";
-import { FaHome, FaPlus, FaCalendarAlt, FaChartPie, FaPiggyBank, FaCreditCard, FaListAlt } from 'react-icons/fa';
-import { IoIosRocket } from 'react-icons/io';
-import styles from '../../styles/Sidebar.module.css';
+import styles from '../../styles/Sidebar.module.css'; // Corrigido o caminho
+import Image from 'next/image';
+import {
+  FaTachometerAlt,
+  FaHistory,
+  FaPiggyBank,
+  FaChartLine,
+  FaCog,
+} from 'react-icons/fa';
 
-interface SidebarProps {
-  onOpenModal: () => void;
-}
+const navItems = [
+  { href: '/dashboard', label: 'Dashboard', icon: FaTachometerAlt },
+  { href: '/history', label: 'Histórico', icon: FaHistory },
+  { href: '/budget', label: 'Orçamentos', icon: FaPiggyBank },
+  { href: '/investments', label: 'Investimentos', icon: FaChartLine },
+  { href: '/settings', label: 'Configurações', icon: FaCog },
+];
 
-const Sidebar: React.FC<SidebarProps> = ({ onOpenModal }) => {
-  const { user } = useAuth();
+const Sidebar: React.FC = () => {
   const pathname = usePathname();
 
-  const navItems = [
-    { href: '/dashboard', icon: <FaHome />, label: 'Dashboard' },
-    { href: '/transactions', icon: <FaListAlt />, label: 'Transações' },
-    { href: '/calendar', icon: <FaCalendarAlt />, label: 'Calendário' },
-    { href: '/budget', icon: <FaChartPie />, label: 'Orçamento' },
-    { href: '/investments', icon: <IoIosRocket />, label: 'Investimentos' },
-    { href: '/goals', icon: <FaPiggyBank />, label: 'Metas' },
-    { href: '/payment-methods', icon: <FaCreditCard />, label: 'Meus Cartões' },
-  ];
-
   return (
-    <div className={styles.sidebar}>
-      <div className={styles.profile}>
-        <div className={styles.avatar}>
-          {user?.displayName ? user.displayName.charAt(0).toUpperCase() : (user?.email ? user.email.charAt(0).toUpperCase() : 'A')}
-        </div>
-        <p className={styles.email}>{user?.email}</p>
+    <aside className={styles.sidebar}>
+      <div className={styles.logoContainer}>
+        {/* Tamanho do logo aumentado para 60x60 */}
+        <Image src="/imagem_4.png" alt="MoneyForge Logo" width={60} height={60} />
+        <span className={styles.logoText}>MoneyForge</span>
       </div>
       <nav className={styles.nav}>
-        {/* O botão 'Nova Transação' mantém o onClick para abrir o modal */}
-        <a href="#" className={styles.navItem} onClick={onOpenModal}>
-          <FaPlus /> Nova Transação
-        </a>
-
-        {/* Os itens de navegação agora usam <Link> */}
-        {navItems.map(item => (
-          <Link key={item.href} href={item.href} className={`${styles.navItem} ${pathname === item.href ? styles.active : ''}`}>
-            {item.icon} {item.label}
-          </Link>
-        ))}
+        <ul>
+          {navItems.map(({ href, label, icon: Icon }) => (
+            <li key={href}>
+              <Link href={href} className={`${styles.navLink} ${pathname === href ? styles.active : ''}`}>
+                <Icon className={styles.navIcon} />
+                <span className={styles.navLabel}>{label}</span>
+              </Link>
+            </li>
+          ))}
+        </ul>
       </nav>
-    </div>
+    </aside>
   );
 };
 

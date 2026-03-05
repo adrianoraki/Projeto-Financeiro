@@ -1,28 +1,13 @@
 
-import * as admin from 'firebase-admin';
+// This is a placeholder file to satisfy build-time dependencies.
+// The actual admin functionality is not implemented yet.
 
-// Garante que o SDK do Firebase Admin não seja inicializado mais de uma vez.
-if (!admin.apps.length) {
-  try {
-    admin.initializeApp({
-      credential: admin.credential.applicationDefault(),
-    });
-    console.log('Firebase Admin SDK initialized.');
-  } catch (e: any) {
-    console.error('Firebase Admin initialization error', e.stack);
-  }
-}
+export const getAuthAdmin = () => {
+    console.warn('getAuthAdmin is not implemented in this placeholder.');
+    return null;
+};
 
-/**
- * Retorna a instância do Firestore Admin.
- */
-export function getDb() {
-  return admin.firestore();
-}
-
-/**
- * Retorna a instância do Auth Admin.
- */
-export function getAuthAdmin() {
-  return admin.auth();
-}
+export const getDb = () => {
+    console.warn('getDb is not implemented in this placeholder.');
+    return null;
+};

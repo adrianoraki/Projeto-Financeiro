@@ -1,70 +1,77 @@
-/* styles/DashboardPage.module.css */
 
 .container {
-    padding: 0; /* Remove padding para um visual mais limpo */
-    background-color: #121212;
-    color: #E0E0E0;
-}
-
-.mainGrid {
-    display: grid;
-    gap: 1.5rem;
-    padding: 1.5rem; /* Adiciona padding ao redor do grid */
-
-    /* Define a estrutura do grid com áreas nomeadas */
-    grid-template-columns: repeat(3, 1fr); /* Três colunas de largura igual */
-    grid-template-areas:
-        "balance        income-expense  pie"
-        "goals          cdi             investments";
-}
-
-/* Áreas do Grid */
-.balanceArea { grid-area: balance; }
-.incomeExpenseArea { grid-area: income-expense; }
-.pieArea { grid-area: pie; }
-.goalsArea { grid-area: goals; }
-.cdiArea { grid-area: cdi; }
-.investmentsArea { grid-area: investments; }
-
-/* Estilo unificado para todos os cards e seções do grid */
-.gridSection {
-    background-color: #1C1C22;
-    padding: 1.5rem;
-    border-radius: 12px;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
     display: flex;
     flex-direction: column;
-    min-height: 350px; /* Garante uma altura mínima para todos */
+    gap: 2rem;
 }
 
-/* --- Media Queries para Responsividade --- */
-
-/* Para tablets e telas médias */
-@media (max-width: 1200px) {
-    .mainGrid {
-        grid-template-columns: repeat(2, 1fr); /* Duas colunas */
-        grid-template-areas:
-            "balance        income-expense"
-            "pie            goals"
-            "cdi            investments";
-    }
+.welcomeMessage h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #2d3748;
+    margin: 0;
 }
 
-/* Para celulares */
-@media (max-width: 768px) {
-    .mainGrid {
-        grid-template-columns: 1fr; /* Uma única coluna */
-        grid-template-areas:
-            "balance"
-            "income-expense"
-            "pie"
-            "goals"
-            "cdi"
-            "investments";
-        padding: 1rem 0;
-    }
+.welcomeMessage p {
+    font-size: 1rem;
+    color: #718096;
+    margin-top: 0.5rem;
+}
 
-    .gridSection {
-        border-radius: 0; /* Remove bordas para visual full-width */
-    }
+.summaryCards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+.card {
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.07);
+}
+
+.card h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #4a5568;
+    margin: 0 0 1rem 0;
+}
+
+.card p {
+    margin: 0;
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+.balance {
+    color: #3B82F6; /* Azul */
+}
+
+.income {
+    color: #10B981; /* Verde */
+}
+
+.expense {
+    color: #EF4444; /* Vermelho */
+}
+
+.savings {
+    color: #F59E0B; /* Amarelo/Laranja */
+    font-size: 1.5rem; /* Fonte menor para caber os dois valores */
+}
+
+.placeholder {
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 3rem;
+    text-align: center;
+    color: #a0aec0;
+    border: 2px dashed #e2e8f0;
 }

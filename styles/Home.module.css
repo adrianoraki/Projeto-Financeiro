@@ -1,133 +1,123 @@
-/* styles/Home.module.css */
 
 .container {
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 80vh;
-  text-align: center;
-  padding: 0 1rem;
-  background-color: #f7f9fc;
+  background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('/telalogin.jpg');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
 }
 
 .main {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  max-width: 800px;
-  padding-bottom: 3rem;
+  flex-grow: 1;
+  padding: 0 4rem;
 }
 
 .hero {
-  width: 100%;
+  text-align: center;
+  padding: 8rem 1rem 6rem;
+  background-color: rgba(17, 24, 39, 0.3); /* Fundo semi-transparente */
+  border-radius: 12px;
+  margin: 4rem 0;
 }
 
 .title {
-  font-family: 'serif';
-  font-size: 2.2rem;
-  font-weight: 500;
-  color: #4a5568;
+  font-size: 3.5rem;
+  font-weight: 800;
+  color: #ffffff; /* Cor do texto alterada para branco */
   margin-bottom: 1.5rem;
 }
 
 .appName {
-  display: block;
-  font-family: 'serif';
-  font-size: 3.8rem;
-  font-weight: 700;
-  color: #0052cc;
-  margin-top: 0.5rem;
+  color: #FFD700; /* Dourado para o nome da aplicação */
 }
 
 .description {
-  font-family: 'serif';
-  font-size: 1.1rem;
-  color: #5a657d;
-  max-width: 550px;
-  margin: 0 auto 2.5rem;
-  line-height: 1.6;
+  font-size: 1.3rem;
+  color: #E5E7EB; /* Cinza claro para o texto */
+  max-width: 650px;
+  margin: 0 auto 3rem;
+}
+
+.ctaContainer {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
 }
 
 .ctaButton {
   display: inline-block;
-  padding: 14px 32px;
+  padding: 1rem 2.5rem;
   font-size: 1.1rem;
-  font-weight: 600;
-  color: #fff;
-  background-color: #007bff;
+  font-weight: 700;
+  color: #ffffff;
+  background-color: #3B82F6;
   border-radius: 50px;
   text-decoration: none;
-  transition: background-color 0.2s ease, transform 0.2s ease;
+  transition: background-color 0.3s, transform 0.2s;
   border: none;
-  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.3);
 }
 
 .ctaButton:hover {
-  background-color: #0056b3;
-  transform: translateY(-2px);
+  background-color: #2563EB;
+  transform: translateY(-3px);
 }
 
-.featuresSection {
-  width: 100%;
+.features {
+  padding: 4rem 1rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2.5rem;
   max-width: 1200px;
-  padding: 4rem 2rem;
   margin: 0 auto;
 }
 
-.featuresGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 2.5rem;
-  text-align: center;
-}
-
 .featureCard {
-  background-color: #ffffff;
   padding: 2.5rem;
-  border-radius: 12px;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.07);
-  border: 1px solid #e2e8f0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border-radius: 15px;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s, box-shadow 0.3s;
+  backdrop-filter: blur(5px);
 }
 
 .featureCard:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.1);
-}
-
-.iconWrapper {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  background-color: #e3f2fd; /* Fundo azul claro para o ícone */
-  margin-bottom: 1.5rem;
-}
-
-.icon {
-  font-size: 1.8rem;
-  color: #007bff;
+  transform: translateY(-8px);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
 }
 
 .featureCard h3 {
-  font-family: 'serif';
-  font-size: 1.4rem;
-  font-weight: 600;
-  color: #2d3748;
+  font-size: 1.6rem;
+  font-weight: 700;
   margin-bottom: 1rem;
 }
 
 .featureCard p {
-  font-family: 'serif';
   font-size: 1rem;
-  color: #5a657d;
   line-height: 1.7;
 }
+
+/* Paleta "Prestígio & Confiança" */
+.featureCard1 {
+  background-color: rgba(255, 255, 255, 0.9);
+  border: 1px solid #FFD700;
+  color: #4B5563;
+}
+.featureCard1 h3 { color: #1F2937; }
+
+.featureCard2 {
+  background-color: #FFD700;
+  color: #1F2937;
+}
+.featureCard2 h3 { color: #111827; }
+.featureCard2 p { color: #374151; }
+
+.featureCard3 {
+  background-color: #4285F4;
+  color: #ffffff;
+}
+.featureCard3 h3 { color: #ffffff; }
+.featureCard3 p { color: #E5E7EB; }
+

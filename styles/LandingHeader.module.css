@@ -1,0 +1,50 @@
+
+/* styles/LandingHeader.module.css */
+
+.header {
+    position: absolute;
+    top: 2rem;
+    left: 2rem;
+    z-index: 10;
+}
+
+.logoLink {
+    text-decoration: none;
+    color: inherit;
+    display: inline-block;
+}
+
+.logoContainer {
+    display: flex;
+    align-items: center;
+    gap: 0; /* Espaçamento removido pois a imagem foi ocultada */
+}
+
+.logo {
+    /* O tamanho é controlado pelas props do componente Image */
+}
+
+.logoTextContainer {
+    display: flex;
+    flex-direction: column;
+}
+
+.appName {
+    font-family: serif;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #ffffff;
+    text-shadow: 0 2px 5px rgba(0, 0, 0, 0.6);
+    margin: 0;
+    line-height: 1.1;
+}
+
+.slogan {
+    font-family: sans-serif;
+    font-size: 0.85rem;
+    font-weight: 400;
+    color: rgba(255, 255, 255, 0.9);
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+    margin: 0;
+    margin-top: -2px;
+}

@@ -1,139 +1,162 @@
+
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-import { useAuth } from '@/lib/AuthContext';
-import BudgetForm from '@/components/budget/BudgetForm';
-import BudgetCard from '@/components/budget/BudgetCard';
-import styles from '@/styles/BudgetPage.module.css';
-import type { Budget } from '@/types'; // Corrigido: Importando do arquivo de tipos compartilhado
+import React, { useState, useEffect } from 'react';
+import { collection, addDoc, getDocs, deleteDoc, doc, updateDoc, serverTimestamp, Timestamp } from 'firebase/firestore';
+import { db } from '../../../lib/firebase';
+import { useAuth } from '../../../lib/AuthContext';
+import styles from '../../../styles/Budget.module.css';
+import { FaPlus, FaEdit, FaTrash, FaSave, FaTimes } from 'react-icons/fa';
 
-const BudgetPage = () => {
+interface BudgetItem {
+  id: string;
+  name: string;
+  amount: number;
+  category: string;
+  createdAt: Timestamp;
+}
+
+export default function BudgetPage() {
   const { user } = useAuth();
-  const [budgets, setBudgets] = useState<Budget[]>([]);
-  const [isFormOpen, setFormOpen] = useState(false);
-  const [editingBudget, setEditingBudget] = useState<Budget | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [budgetItems, setBudgetItems] = useState<BudgetItem[]>([]);
+  const [newItemName, setNewItemName] = useState('');
+  const [newItemAmount, setNewItemAmount] = useState('');
+  const [newItemCategory, setNewItemCategory] = useState('');
+  const [editingItem, setEditingItem] = useState<string | null>(null);
+  const [editName, setEditName] = useState('');
+  const [editAmount, setEditAmount] = useState('');
+  const [editCategory, setEditCategory] = useState('');
 
-  const fetchBudgets = useCallback(async () => {
-    if (!user) return;
-    try {
-      const idToken = await user.getIdToken();
-      const response = await fetch('/api/budget', {
-        headers: {
-          'Authorization': `Bearer ${idToken}`,
-        },
-      });
-      if (!response.ok) {
-        throw new Error('Falha ao buscar orçamentos');
+  const fetchBudgetItems = async () => {
+    if (user) {
+      try {
+        const querySnapshot = await getDocs(collection(db, `users/${user.uid}/budget`));
+        const items: BudgetItem[] = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as BudgetItem));
+        setBudgetItems(items);
+      } catch (error) {
+        console.error("Error fetching budget items: ", error);
       }
-      const data = await response.json();
-      setBudgets(data);
-    } catch (err: any) {
-      setError(err.message);
-      console.error(err);
     }
-  }, [user]);
+  };
 
   useEffect(() => {
-    fetchBudgets();
-  }, [fetchBudgets]);
+    fetchBudgetItems();
+  }, [user]);
 
-  const handleSaveBudget = async (budgetData: { name: string; category: string; limit: number; }) => {
-    if (!user) return;
-
-    try {
-      const idToken = await user.getIdToken();
-      const method = editingBudget ? 'PUT' : 'POST';
-      const url = editingBudget ? `/api/budget/${editingBudget.id}` : '/api/budget';
-
-      const response = await fetch(url, {
-        method,
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${idToken}`,
-        },
-        body: JSON.stringify(budgetData),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Falha ao salvar orçamento');
+  const addBudgetItem = async () => {
+    if (user && newItemName && newItemAmount) {
+      try {
+        await addDoc(collection(db, `users/${user.uid}/budget`), {
+          name: newItemName,
+          amount: parseFloat(newItemAmount),
+          category: newItemCategory,
+          createdAt: serverTimestamp()
+        });
+        setNewItemName('');
+        setNewItemAmount('');
+        setNewItemCategory('');
+        fetchBudgetItems();
+      } catch (error) {
+        console.error("Error adding budget item: ", error);
       }
-
-      setFormOpen(false);
-      setEditingBudget(null);
-      fetchBudgets(); // Re-fetch budgets after saving
-    } catch (err: any) {
-      setError(err.message);
-      console.error("Failed to save budget:", err);
     }
   };
 
-  const handleEditBudget = (budget: Budget) => {
-    setEditingBudget(budget);
-    setFormOpen(true);
-  };
-
-  const handleDeleteBudget = async (id: string) => {
-    if (!user) return;
-    try {
-      const idToken = await user.getIdToken();
-      const response = await fetch(`/api/budget/${id}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${idToken}`,
-        },
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Falha ao deletar orçamento');
+  const deleteBudgetItem = async (id: string) => {
+    if (user) {
+      try {
+        await deleteDoc(doc(db, `users/${user.uid}/budget`, id));
+        fetchBudgetItems();
+      } catch (error) {
+        console.error("Error deleting budget item: ", error);
       }
-
-      fetchBudgets(); // Re-fetch budgets after deleting
-    } catch (err: any) {
-      setError(err.message);
-      console.error("Failed to delete budget:", err);
     }
   };
 
-  const handleAddNew = () => {
-    setEditingBudget(null);
-    setFormOpen(true);
+  const startEditing = (item: BudgetItem) => {
+    setEditingItem(item.id);
+    setEditName(item.name);
+    setEditAmount(item.amount.toString());
+    setEditCategory(item.category);
+  };
+
+  const cancelEditing = () => {
+    setEditingItem(null);
+    setEditName('');
+    setEditAmount('');
+    setEditCategory('');
+  };
+
+  const saveEditing = async (id: string) => {
+    if (user) {
+      try {
+        await updateDoc(doc(db, `users/${user.uid}/budget`, id), {
+          name: editName,
+          amount: parseFloat(editAmount),
+          category: editCategory
+        });
+        cancelEditing();
+        fetchBudgetItems();
+      } catch (error) {
+        console.error("Error updating budget item: ", error);
+      }
+    }
   };
 
   return (
-    <div className={styles.container}>
-      <header className={styles.header}>
-        <h1>Orçamentos</h1>
-        <p>Crie e gerencie seus orçamentos para controlar seus gastos.</p>
-        <button onClick={handleAddNew} className={styles.addButton}>
-          Adicionar Novo Orçamento
-        </button>
-      </header>
-
-      {error && <p className={styles.error}>{error}</p>}
-
-      {isFormOpen && (
-        <BudgetForm
-          onSave={handleSaveBudget}
-          onClose={() => setFormOpen(false)}
-          budget={editingBudget || undefined}
+    <div className={styles.budgetContainer}>
+      <h1 className={styles.title}>Orçamento Mensal</h1>
+      
+      <div className={styles.inputForm}>
+        <input
+          type="text"
+          value={newItemName}
+          onChange={(e) => setNewItemName(e.target.value)}
+          placeholder="Nome do Item"
+          className={styles.input}
         />
-      )}
-
-      <div className={styles.budgetList}>
-        {budgets.map((budget) => (
-          <BudgetCard
-            key={budget.id}
-            budget={budget}
-            onEdit={() => handleEditBudget(budget)}
-            onDelete={() => handleDeleteBudget(budget.id)}
-          />
-        ))}
+        <input
+          type="number"
+          value={newItemAmount}
+          onChange={(e) => setNewItemAmount(e.target.value)}
+          placeholder="Valor"
+          className={styles.input}
+        />
+        <input
+          type="text"
+          value={newItemCategory}
+          onChange={(e) => setNewItemCategory(e.target.value)}
+          placeholder="Categoria"
+          className={styles.input}
+        />
+        <button onClick={addBudgetItem} className={styles.addButton}><FaPlus /> Adicionar</button>
       </div>
+
+      <ul className={styles.budgetList}>
+        {budgetItems.map(item => (
+          <li key={item.id} className={styles.budgetItem}>
+            {editingItem === item.id ? (
+              <div className={styles.editForm}>
+                <input type="text" value={editName} onChange={(e) => setEditName(e.target.value)} className={styles.input} />
+                <input type="number" value={editAmount} onChange={(e) => setEditAmount(e.target.value)} className={styles.input} />
+                <input type="text" value={editCategory} onChange={(e) => setEditCategory(e.target.value)} className={styles.input} />
+                <button onClick={() => saveEditing(item.id)} className={styles.saveButton}><FaSave /></button>
+                <button onClick={cancelEditing} className={styles.cancelButton}><FaTimes /></button>
+              </div>
+            ) : (
+              <>
+                <span className={styles.itemName}>{item.name}</span>
+                <span className={styles.itemCategory}>{item.category}</span>
+                <span className={styles.itemAmount}>R$ {item.amount.toFixed(2)}</span>
+                <div className={styles.itemActions}>
+                  <button onClick={() => startEditing(item)} className={styles.editButton}><FaEdit /></button>
+                  <button onClick={() => deleteBudgetItem(item.id)} className={styles.deleteButton}><FaTrash /></button>
+                </div>
+              </>
+            )}
+          </li>
+        ))}
+      </ul>
     </div>
   );
-};
-
-export default BudgetPage;
+}

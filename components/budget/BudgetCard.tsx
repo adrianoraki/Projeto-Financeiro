@@ -11,7 +11,7 @@ interface Props {
 }
 
 const BudgetCard = ({ budget, onEdit, onDelete }: Props) => {
-  const { category, limit, spent } = budget;
+  const { limit, spent } = budget; // Removido 'category' que não estava sendo usado
   const progress = (spent / limit) * 100;
 
   const getProgressBarColor = () => {

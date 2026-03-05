@@ -1,87 +1,49 @@
-/* styles/Header.module.css */
 
 .header {
-  width: 100%;
-  padding: 1rem 2rem;
-  background-color: #ffffff;
-  border-bottom: 1px solid #e2e8f0;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+    display: flex;
+    align-items: center;
+    padding: 1rem 2rem;
+    background-color: #1a202c;
+    color: #ffffff;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    width: 100%;
 }
 
-.container {
-  width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+.logoLink {
+    text-decoration: none;
+    color: inherit;
 }
 
 .logoContainer {
-  display: flex;
-  align-items: center;
+    display: flex;
+    align-items: center;
+    gap: 0; /* Espaçamento removido pois a imagem foi ocultada */
+}
+
+.logo {
+    object-fit: contain;
 }
 
 .logoTextContainer {
-  display: flex;
-  align-items: baseline;
-  margin-left: 0.8rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 .appName {
-  font-family: 'serif';
-  font-size: 2rem;
-  font-weight: 600;
-  color: #2d3748;
-  margin-right: 0.8rem;
-  text-decoration: underline;
-  text-decoration-color: #4c51bf; /* Roxo/Azul para combinar */
-  text-underline-offset: 5px;
-  text-decoration-thickness: 2px;
+    font-family: 'serif';
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin: 0;
+    line-height: 1.1;
 }
 
 .slogan {
-  font-family: 'serif';
-  font-size: 0.9rem;
-  color: #4a5568;
-  font-style: italic;
-  text-decoration: underline;
-  text-decoration-color: #a0aec0;
-  text-underline-offset: 3px;
-}
-
-.nav {
-  display: flex;
-  align-items: center;
-}
-
-.navLink {
-  margin: 0 1rem;
-  font-size: 1rem;
-  font-family: 'sans-serif';
-  color: #4a5568;
-  text-decoration: none;
-  transition: color 0.2s ease;
-}
-
-.navLink:hover {
-  color: #0070f3;
-}
-
-.logoutButton {
-  margin-left: 1rem;
-  padding: 0.5rem 1rem;
-  font-size: 1rem;
-  color: #fff;
-  background-color: #e53e3e;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-}
-
-.logoutButton:hover {
-  background-color: #c53030;
+    font-size: 0.8rem;
+    font-weight: 400;
+    color: rgba(255, 255, 255, 0.8);
+    margin: 0;
+    margin-top: 2px;
 }
