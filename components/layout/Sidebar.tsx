@@ -4,7 +4,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import styles from '../../styles/Sidebar.module.css'; // Corrigido o caminho
+import styles from '../../styles/Sidebar.module.css';
 import Image from 'next/image';
 import {
   FaTachometerAlt,
@@ -12,7 +12,13 @@ import {
   FaPiggyBank,
   FaChartLine,
   FaCog,
+  FaPlusCircle, // Ícone para Nova Transação
 } from 'react-icons/fa';
+
+// Interface para as props do Sidebar
+interface SidebarProps {
+  onOpenModal: () => void;
+}
 
 const navItems = [
   { href: '/dashboard', label: 'Dashboard', icon: FaTachometerAlt },
@@ -22,16 +28,24 @@ const navItems = [
   { href: '/settings', label: 'Configurações', icon: FaCog },
 ];
 
-const Sidebar: React.FC = () => {
+const Sidebar: React.FC<SidebarProps> = ({ onOpenModal }) => {
   const pathname = usePathname();
 
   return (
     <aside className={styles.sidebar}>
       <div className={styles.logoContainer}>
-        {/* Tamanho do logo aumentado para 60x60 */}
         <Image src="/imagem_4.png" alt="MoneyForge Logo" width={60} height={60} />
         <span className={styles.logoText}>MoneyForge</span>
       </div>
+      
+      {/* Botão de Nova Transação */}
+      <div className={styles.newTransactionContainer}>
+        <button onClick={onOpenModal} className={styles.newTransactionButton}>
+          <FaPlusCircle className={styles.newTransactionIcon} />
+          <span>Nova Transação</span>
+        </button>
+      </div>
+
       <nav className={styles.nav}>
         <ul>
           {navItems.map(({ href, label, icon: Icon }) => (

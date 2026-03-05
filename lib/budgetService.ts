@@ -1,5 +1,5 @@
 
-import { getDb } from './firebaseAdmin';
+import { admin } from './firebaseAdmin';
 import { FieldValue } from 'firebase-admin/firestore';
 import { z } from 'zod';
 import { toCents } from './currencyUtils';
@@ -41,11 +41,7 @@ export const addBudget = async (budgetInput: BudgetInput) => {
   const { limit, ...restData } = validation.data;
 
   try {
-    const firestore = getDb();
-    if (!firestore) {
-        console.error("A conexão com o Firestore não está disponível.");
-        throw new Error("Não foi possível adicionar o orçamento.");
-    }
+    const firestore = admin.firestore();
     const docRef = await firestore.collection(BUDGETS_COLLECTION).add({
       ...restData,
       limit: toCents(limit), 
@@ -63,11 +59,7 @@ export const getBudgetsByOwner = async (uid: string): Promise<Budget[]> => {
   if (!uid) throw new Error("UID do usuário é obrigatório.");
 
   try {
-    const firestore = getDb();
-    if (!firestore) {
-        console.error("A conexão com o Firestore não está disponível.");
-        return [];
-    }
+    const firestore = admin.firestore();
     const q = firestore.collection(BUDGETS_COLLECTION).where("uid", "==", uid);
     const querySnapshot = await q.get();
     return querySnapshot.docs.map(doc => ({
@@ -86,11 +78,7 @@ export const updateBudget = async (budgetId: string, uid: string, budgetUpdate: 
     throw new Error(`Dados do orçamento inválidos: ${validation.error.flatten().fieldErrors}`);
   }
 
-  const firestore = getDb();
-  if (!firestore) {
-    console.error("A conexão com o Firestore não está disponível.");
-    throw new Error("Não foi possível atualizar o orçamento.");
-  }
+  const firestore = admin.firestore();
   const budgetRef = firestore.collection(BUDGETS_COLLECTION).doc(budgetId);
   try {
     const budgetDoc = await budgetRef.get();
@@ -113,11 +101,7 @@ export const updateBudget = async (budgetId: string, uid: string, budgetUpdate: 
 export const deleteBudgetForOwner = async (budgetId: string, uid: string) => {
   if (!budgetId || !uid) throw new Error("ID do orçamento e UID do usuário são obrigatórios.");
 
-  const firestore = getDb();
-  if (!firestore) {
-    console.error("A conexão com o Firestore não está disponível.");
-    throw new Error("Não foi possível deletar o orçamento.");
-  }
+  const firestore = admin.firestore();
   const budgetRef = firestore.collection(BUDGETS_COLLECTION).doc(budgetId);
   try {
     const budgetDoc = await budgetRef.get();
@@ -139,11 +123,7 @@ export const updateBudgetSpent = async (budgetId: string, transactionAmount: num
     }
 
     try {
-        const firestore = getDb();
-        if (!firestore) {
-            console.error("A conexão com o Firestore não está disponível.");
-            throw new Error("Não foi possível atualizar o valor gasto do orçamento.");
-        }
+        const firestore = admin.firestore();
         const budgetRef = firestore.collection(BUDGETS_COLLECTION).doc(budgetId);
         const amountInCents = toCents(transactionAmount);
 

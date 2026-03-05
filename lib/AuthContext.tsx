@@ -12,18 +12,17 @@ import {
   GoogleAuthProvider,
   GithubAuthProvider,
   signInWithPopup,
-  UserCredential // Importado para tipagem correta
+  UserCredential
 } from 'firebase/auth';
 import { auth, storage } from './firebase';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { useRouter } from 'next/navigation';
 
-// Interface corrigida para usar UserCredential em vez de any
 interface AuthContextType {
   user: User | null;
   loading: boolean;
   login: (email: string, pass: string) => Promise<UserCredential>;
-  signup: (email: string, pass: string) => Promise<UserCredential>;
+  signup: (email: string, pass: string, name: string) => Promise<UserCredential>;
   loginWithGoogle: () => Promise<UserCredential>;
   loginWithGitHub: () => Promise<UserCredential>;
   logout: () => void;
@@ -50,8 +49,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return signInWithEmailAndPassword(auth, email, pass);
   };
 
-  const signup = (email: string, pass: string) => {
-    return createUserWithEmailAndPassword(auth, email, pass);
+  const signup = async (email: string, pass: string, name: string) => {
+    const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
+    if (userCredential.user) {
+      await updateProfile(userCredential.user, { displayName: name });
+      // Atualiza o estado do usuário manualmente para refletir o nome imediatamente
+      setUser({ ...userCredential.user, displayName: name });
+    }
+    return userCredential;
   };
 
   const loginWithGoogle = () => {

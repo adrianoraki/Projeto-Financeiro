@@ -2,8 +2,8 @@
 'use client';
 
 import React from 'react';
-import { useAuth } from '../../../lib/AuthContext';
-import styles from '../../../styles/AppHeader.module.css';
+import { useAuth } from '../../lib/AuthContext';
+import styles from '../../styles/Header.module.css';
 import { useRouter } from 'next/navigation';
 
 const AppHeader: React.FC = () => {

@@ -1,4 +1,6 @@
 
+'use client';
+
 import React from 'react';
 import AppHeader from '../../components/layout/AppHeader';
 import Sidebar from '../../components/layout/Sidebar';
@@ -9,9 +11,13 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const handleOpenModal = () => {
+    // Função vazia para satisfazer a prop, já que este layout é um conflito
+  };
+
   return (
     <div className={styles.dashboardContainer}>
-        <Sidebar />
+        <Sidebar onOpenModal={handleOpenModal} />
         <main className={styles.mainContent}>
             <AppHeader />
             <div className={styles.pageContent}>
